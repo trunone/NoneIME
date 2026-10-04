@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Dictionary\Boshiamy.txt" />
+    <None Include="Dictionary\Boshiamy-source.txt" />
+    <None Include="Dictionary\Boshiamy-GPL-3.0.txt" />
+    <None Include="Dictionary\Boshiamy-README.md" />
+    <None Include="Dictionary\Boshiamy-Homophones.txt" />
+    <None Include="Dictionary\build_boshiamy_table.ps1" />
+    <None Include="Dictionary\build_boshiamy_homophones.ps1" />
+    <None Include="NoneIME.ini" />
+    <None Include="image\DoubleSingleByteOff.ico" />
+    <None Include="image\DoubleSingleByteOn.ico" />
+    <None Include="image\ImeModeOff.ico" />
+    <None Include="image\ImeModeOn.ico" />
+    <None Include="image\PunctuationOff.ico" />
+    <None Include="image\PunctuationOn.ico" />
+    <None Include="image\NoneIME.ico" />
+    <None Include="NoneIME.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\BaseDictionaryEngine.h" />
+    <ClInclude Include="include\BaseWindow.h" />
+    <ClInclude Include="include\ButtonWindow.h" />
+    <ClInclude Include="include\CandidateListUIPresenter.h" />
+    <ClInclude Include="include\CandidateWindow.h" />
+    <ClInclude Include="include\Compartment.h" />
+    <ClInclude Include="include\CompositionProcessorEngine.h" />
+    <ClInclude Include="include\Define.h" />
+    <ClInclude Include="include\EnumTfCandidates.h" />
+    <ClInclude Include="include\KeyStateCategory.h" />
+    <ClInclude Include="include\NoneIMEBaseStructure.h" />
+    <ClInclude Include="include\SearchCandidateProvider.h" />
+    <ClInclude Include="include\DictionaryParser.h" />
+    <ClInclude Include="include\DictionarySearch.h" />
+    <ClInclude Include="include\DisplayAttributeInfo.h" />
+    <ClInclude Include="include\EditSession.h" />
+    <ClInclude Include="include\EnumDisplayAttributeInfo.h" />
+    <ClInclude Include="include\File.h" />
+    <ClInclude Include="include\FileMapping.h" />
+    <ClInclude Include="include\GetTextExtentEditSession.h" />
+    <ClInclude Include="include\Globals.h" />
+    <ClInclude Include="include\KeyHandlerEditSession.h" />
+    <ClInclude Include="include\LanguageBar.h" />
+    <ClInclude Include="include\Private.h" />
+    <ClInclude Include="include\RegKey.h" />
+    <ClInclude Include="include\resource.h" />
+    <ClInclude Include="include\NoneIME.h" />
+    <ClInclude Include="include\ScrollBarWindow.h" />
+    <ClInclude Include="include\ShadowWindow.h" />
+    <ClInclude Include="include\stdafx.h" />
+    <ClInclude Include="include\TableDictionaryEngine.h" />
+    <ClInclude Include="include\TfInputProcessorProfile.h" />
+    <ClInclude Include="include\TfTextLayoutSink.h" />
+    <ClInclude Include="include\TipCandidateList.h" />
+    <ClInclude Include="include\TipCandidateString.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ActiveLanguageProfileNotifySink.cpp" />
+    <ClCompile Include="src\BaseDictionaryEngine.cpp" />
+    <ClCompile Include="src\BaseWindow.cpp" />
+    <ClCompile Include="src\ButtonWindow.cpp" />
+    <ClCompile Include="src\CandidateListUIPresenter.cpp" />
+    <ClCompile Include="src\CandidateWindow.cpp" />
+    <ClCompile Include="src\Compartment.cpp" />
+    <ClCompile Include="src\Composition.cpp" />
+    <ClCompile Include="src\CompositionProcessorEngine.cpp" />
+    <ClCompile Include="src\EnumTfCandidates.cpp" />
+    <ClCompile Include="src\KeyStateCategory.cpp" />
+    <ClCompile Include="src\NoneIMEBaseStructure.cpp" />
+    <ClCompile Include="src\SearchCandidateProvider.cpp" />
+    <ClCompile Include="src\DictionaryParser.cpp" />
+    <ClCompile Include="src\DictionarySearch.cpp" />
+    <ClCompile Include="src\DisplayAttribute.cpp" />
+    <ClCompile Include="src\DisplayAttributeInfo.cpp" />
+    <ClCompile Include="src\DisplayAttributeProvider.cpp" />
+    <ClCompile Include="src\DllMain.cpp" />
+    <ClCompile Include="src\EditSession.cpp" />
+    <ClCompile Include="src\EndComposition.cpp" />
+    <ClCompile Include="src\EnumDisplayAttributeInfo.cpp" />
+    <ClCompile Include="src\File.cpp" />
+    <ClCompile Include="src\FileMapping.cpp" />
+    <ClCompile Include="src\FunctionProviderSink.cpp" />
+    <ClCompile Include="src\GetTextExtentEditSession.cpp" />
+    <ClCompile Include="src\Globals.cpp" />
+    <ClCompile Include="src\KeyEventSink.cpp" />
+    <ClCompile Include="src\KeyHandler.cpp" />
+    <ClCompile Include="src\KeyHandlerEditSession.cpp" />
+    <ClCompile Include="src\LanguageBar.cpp" />
+    <ClCompile Include="src\Register.cpp" />
+    <ClCompile Include="src\RegKey.cpp" />
+    <ClCompile Include="src\ScrollBarWindow.cpp" />
+    <ClCompile Include="src\Server.cpp" />
+    <ClCompile Include="src\ShadowWindow.cpp" />
+    <ClCompile Include="src\StartComposition.cpp" />
+    <ClCompile Include="src\TableDictionaryEngine.cpp" />
+    <ClCompile Include="src\NoneIME.cpp" />
+    <ClCompile Include="src\TextEditSink.cpp" />
+    <ClCompile Include="src\TfInputProcessorProfile.cpp" />
+    <ClCompile Include="src\TfTextLayoutSink.cpp" />
+    <ClCompile Include="src\ThreadFocusSink.cpp" />
+    <ClCompile Include="src\ThreadMgrEventSink.cpp" />
+    <ClCompile Include="src\TipCandidateList.cpp" />
+    <ClCompile Include="src\TipCandidateString.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="NoneIME.rc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0C8FE010-5146-44D8-AF99-82702C15FEA5}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>NoneIME</RootNamespace>
+    <ProjectName>None IME</ProjectName>
+    <TargetName>NoneIME</TargetName>
+    <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''">$(VCTargetsPath11)</VCTargetsPath>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NoneIME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>NoneIME.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NoneIME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>NoneIME.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NoneIME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BrowseInformation>false</BrowseInformation>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>NoneIME.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NoneIME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BrowseInformation>false</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>NoneIME.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="CopyRuntimeFiles" AfterTargets="Build">
+    <Copy SourceFiles="$(ProjectDir)Dictionary\Boshiamy.txt;$(ProjectDir)Dictionary\Boshiamy-Homophones.txt;$(ProjectDir)NoneIME.ini" DestinationFolder="$(TargetDir)" />
+  </Target>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
