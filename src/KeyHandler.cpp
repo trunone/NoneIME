@@ -66,6 +66,7 @@ VOID CNoneIME::_DeleteCandidateList(BOOL isForce, _In_opt_ ITfContext *pContext)
         _candidateMode = CANDIDATE_NONE;
         _isCandidateWithWildcard = FALSE;
     }
+    _isErrorCandidate = FALSE;
 }
 
 //+---------------------------------------------------------------------------
@@ -215,24 +216,6 @@ HRESULT CNoneIME::_HandleCompositionInputWorker(_In_ CCompositionProcessorEngine
         {
             _pCandidateListUIPresenter->_ClearList();
             _pCandidateListUIPresenter->_SetText(&candidateList, TRUE);
-        }
-    }
-    else if (pCompositionProcessorEngine->IsDictionaryAvailable() && readingStrings.Count() && !isWildcardIncluded)
-    {
-        CCandidateListItem* errorCandidate = candidateList.Append();
-        if (errorCandidate)
-        {
-            CStringRange* readingString = readingStrings.GetAt(0);
-            errorCandidate->_ItemString.Set(readingString->Get(), readingString->GetLength());
-
-            hr = _CreateAndStartCandidate(pCompositionProcessorEngine, ec, pContext);
-            if (SUCCEEDED(hr))
-            {
-                _RemoveDummyCompositionForComposing(ec, _pComposition);
-                _pCandidateListUIPresenter->_ClearList();
-                _pCandidateListUIPresenter->_SetText(&candidateList, FALSE);
-                pCompositionProcessorEngine->PurgeVirtualKey();
-            }
         }
     }
     else if (_pCandidateListUIPresenter)
@@ -436,6 +419,53 @@ HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pC
         if (SUCCEEDED(hr))
         {
             _pCandidateListUIPresenter->_SetText(&candidateList, FALSE);
+        }
+    }
+    else if (pCompositionProcessorEngine->IsDictionaryAvailable() && !isWildcardSearch && pCompositionProcessorEngine->GetVirtualKeyLength())
+    {
+        CNoneImeArray<CStringRange> readingStrings;
+        BOOL isWildcardIncluded = FALSE;
+        pCompositionProcessorEngine->GetReadingStrings(&readingStrings, &isWildcardIncluded);
+        if (!isWildcardIncluded && readingStrings.Count())
+        {
+            CCandidateListItem* errorCandidate = candidateList.Append();
+            if (errorCandidate)
+            {
+                CStringRange* readingString = readingStrings.GetAt(0);
+                DWORD_PTR readingLength = readingString->GetLength();
+                WCHAR* uppercaseReading = new (std::nothrow) WCHAR[readingLength];
+                if (!uppercaseReading)
+                {
+                    return E_OUTOFMEMORY;
+                }
+                memcpy(uppercaseReading, readingString->Get(), readingLength * sizeof(WCHAR));
+                CharUpperBuffW(uppercaseReading, static_cast<DWORD>(readingLength));
+                errorCandidate->_ItemString.Set(uppercaseReading, readingLength);
+
+                if (_pCandidateListUIPresenter)
+                {
+                    _pCandidateListUIPresenter->_EndCandidateList();
+                    delete _pCandidateListUIPresenter;
+                    _pCandidateListUIPresenter = nullptr;
+                    _candidateMode = CANDIDATE_NONE;
+                    _isCandidateWithWildcard = FALSE;
+                }
+
+                hr = _CreateAndStartCandidate(pCompositionProcessorEngine, ec, pContext);
+                if (SUCCEEDED(hr))
+                {
+                    _candidateMode = CANDIDATE_ORIGINAL;
+                    _pCandidateListUIPresenter->_SetTextColor(RGB(255, 0, 0), GetSysColor(COLOR_WINDOW));
+                    _pCandidateListUIPresenter->_SetSelectedTextColor(RGB(255, 0, 0));
+                    _pCandidateListUIPresenter->_ClearList();
+                    _pCandidateListUIPresenter->_SetText(&candidateList, FALSE);
+                    _RemoveDummyCompositionForComposing(ec, _pComposition);
+                    pCompositionProcessorEngine->PurgeVirtualKey();
+                    _isErrorCandidate = TRUE;
+                }
+
+                delete[] uppercaseReading;
+            }
         }
     }
 

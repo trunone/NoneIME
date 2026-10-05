@@ -34,6 +34,7 @@ public:
     void _ResizeToFitCandidates();
 
     VOID _SetTextColor(_In_ COLORREF crColor, _In_ COLORREF crBkColor);
+    VOID _SetSelectedTextColor(_In_ COLORREF crColor);
     VOID _SetFillColor(_In_ HBRUSH hBrush);
 
     LRESULT CALLBACK _WindowProcCallback(_In_ HWND wndHandle, UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
@@ -98,6 +99,7 @@ private:
     CNoneImeArray<UINT> _PageIndex;
 
     COLORREF _crTextColor;
+    COLORREF _crSelectedTextColor;
     COLORREF _crBkColor;
     HBRUSH _brshBkColor;
 

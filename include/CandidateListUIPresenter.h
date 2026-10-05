@@ -76,6 +76,7 @@ public:
     void _SetText(_In_ CNoneImeArray<CCandidateListItem> *pCandidateList, BOOL isAddFindKeyCode);
     void _ClearList();
     VOID _SetTextColor(COLORREF crColor, COLORREF crBkColor);
+    VOID _SetSelectedTextColor(COLORREF crColor);
     VOID _SetFillColor(HBRUSH hBrush);
 
     DWORD_PTR _GetSelectedCandidateString(_Outptr_result_maybenull_ const WCHAR **ppwchCandidateString);

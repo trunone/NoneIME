@@ -231,6 +231,7 @@ private:
     CANDIDATE_MODE _candidateMode;
     CCandidateListUIPresenter *_pCandidateListUIPresenter;
     BOOL _isCandidateWithWildcard;
+    BOOL _isErrorCandidate;
 
     ITfDocumentMgr* _pDocMgrLastFocused;
 

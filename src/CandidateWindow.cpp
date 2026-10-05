@@ -24,6 +24,7 @@ CCandidateWindow::CCandidateWindow(_In_ CANDWNDCALLBACK pfnCallback, _In_ void *
     _currentSelection = 0;
 
     _SetTextColor(CANDWND_ITEM_COLOR, GetSysColor(COLOR_WINDOW));    // text color is black
+    _crSelectedTextColor = CANDWND_SELECTED_ITEM_COLOR;
     _SetFillColor((HBRUSH)(COLOR_WINDOW+1));
 
     _pIndexRange = pIndexRange;
@@ -248,6 +249,11 @@ VOID CCandidateWindow::_SetTextColor(_In_ COLORREF crColor, _In_ COLORREF crBkCo
 {
     _crTextColor = _AdjustTextColor(crColor, crBkColor);
     _crBkColor = crBkColor;
+}
+
+VOID CCandidateWindow::_SetSelectedTextColor(_In_ COLORREF crColor)
+{
+    _crSelectedTextColor = crColor;
 }
 
 VOID CCandidateWindow::_SetFillColor(_In_ HBRUSH hBrush)
@@ -679,7 +685,7 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
         }
         else
         {
-            SetTextColor(dcHandle, CANDWND_SELECTED_ITEM_COLOR);
+            SetTextColor(dcHandle, _crSelectedTextColor);
             SetBkColor(dcHandle, Global::candidateHighlightColor);
         }
 

@@ -77,6 +77,7 @@ CNoneIME::CNoneIME()
     _candidateMode = CANDIDATE_NONE;
     _pCandidateListUIPresenter = nullptr;
     _isCandidateWithWildcard = FALSE;
+    _isErrorCandidate = FALSE;
 
     _pDocMgrLastFocused = nullptr;
 

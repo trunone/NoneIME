@@ -30,6 +30,11 @@ const int MOVETO_BOTTOM = -1;
 
 HRESULT CNoneIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *pContext)
 {
+    if (_isErrorCandidate)
+    {
+        return _HandleCancel(ec, pContext);
+    }
+
     HRESULT hr = S_OK;
     DWORD_PTR candidateLen = 0;
     const WCHAR* pCandidateString = nullptr;
@@ -69,6 +74,21 @@ NoPresenter:
 
 HRESULT CNoneIME::_HandleCandidateConvert(TfEditCookie ec, _In_ ITfContext *pContext)
 {
+    if (_isErrorCandidate)
+    {
+        return _HandleCancel(ec, pContext);
+    }
+
+    if (_candidateMode == CANDIDATE_INCREMENTAL && _pCompositionProcessorEngine->IsDictionaryAvailable())
+    {
+        CNoneImeArray<CCandidateListItem> exactCandidateList;
+        _pCompositionProcessorEngine->GetCandidateList(&exactCandidateList, FALSE, FALSE);
+        if (!exactCandidateList.Count())
+        {
+            return _HandleCompositionConvert(ec, pContext, FALSE);
+        }
+    }
+
     return _HandleCandidateWorker(ec, pContext);
 }
 
@@ -888,6 +908,11 @@ void CCandidateListUIPresenter::_ClearList()
 void CCandidateListUIPresenter::_SetTextColor(COLORREF crColor, COLORREF crBkColor)
 {
     _pCandidateWnd->_SetTextColor(crColor, crBkColor);
+}
+
+void CCandidateListUIPresenter::_SetSelectedTextColor(COLORREF crColor)
+{
+    _pCandidateWnd->_SetSelectedTextColor(crColor);
 }
 
 void CCandidateListUIPresenter::_SetFillColor(HBRUSH hBrush)
