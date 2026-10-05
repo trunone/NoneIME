@@ -264,6 +264,13 @@ BOOL CCompositionProcessorEngine::AddVirtualKey(WCHAR wch)
         return FALSE;
     }
 
+    // Boshiamy composition accepts at most five keystrokes/root characters.
+    // Reject any extra input instead of growing the composition buffer.
+    if (_keystrokeBuffer.GetLength() >= 5)
+    {
+        return FALSE;
+    }
+
     //
     // append one keystroke in buffer.
     //
