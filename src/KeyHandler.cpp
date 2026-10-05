@@ -217,6 +217,24 @@ HRESULT CNoneIME::_HandleCompositionInputWorker(_In_ CCompositionProcessorEngine
             _pCandidateListUIPresenter->_SetText(&candidateList, TRUE);
         }
     }
+    else if (pCompositionProcessorEngine->IsDictionaryAvailable() && readingStrings.Count() && !isWildcardIncluded)
+    {
+        CCandidateListItem* errorCandidate = candidateList.Append();
+        if (errorCandidate)
+        {
+            CStringRange* readingString = readingStrings.GetAt(0);
+            errorCandidate->_ItemString.Set(readingString->Get(), readingString->GetLength());
+
+            hr = _CreateAndStartCandidate(pCompositionProcessorEngine, ec, pContext);
+            if (SUCCEEDED(hr))
+            {
+                _RemoveDummyCompositionForComposing(ec, _pComposition);
+                _pCandidateListUIPresenter->_ClearList();
+                _pCandidateListUIPresenter->_SetText(&candidateList, FALSE);
+                pCompositionProcessorEngine->PurgeVirtualKey();
+            }
+        }
+    }
     else if (_pCandidateListUIPresenter)
     {
         _pCandidateListUIPresenter->_ClearList();
