@@ -38,8 +38,6 @@ CCandidateWindow::CCandidateWindow(_In_ CANDWNDCALLBACK pfnCallback, _In_ void *
 
     _pVScrollBarWnd = nullptr;
 
-    _wndWidth = 0;
-
     _dontAdjustOnEmptyItemPage = FALSE;
 
     _isStoreAppMode = isStoreAppMode;
@@ -65,10 +63,9 @@ CCandidateWindow::~CCandidateWindow()
 // CandidateWinow is the top window
 //----------------------------------------------------------------------------
 
-BOOL CCandidateWindow::_Create(ATOM atom, _In_ UINT wndWidth, _In_opt_ HWND parentWndHandle)
+BOOL CCandidateWindow::_Create(ATOM atom, _In_opt_ HWND parentWndHandle)
 {
     BOOL ret = FALSE;
-    _wndWidth = wndWidth;
 
     ret = _CreateMainWindow(atom, parentWndHandle);
     if (FALSE == ret)
@@ -160,40 +157,37 @@ Exit:
 
 void CCandidateWindow::_ResizeWindow()
 {
-    if (_candidateList.Count() > 0)
+    HDC dcHandle = GetDC(_GetWnd());
+    if (dcHandle)
     {
-        HDC dcHandle = GetDC(_GetWnd());
-        if (dcHandle)
+        HFONT hFontOld = (HFONT)SelectObject(dcHandle, Global::defaultlFontHandle);
+        int candidateWidth = 0;
+        for (UINT index = 0; index < _candidateList.Count(); index++)
         {
-            HFONT hFontOld = (HFONT)SelectObject(dcHandle, Global::defaultlFontHandle);
-            int candidateWidth = 0;
-            for (UINT index = 0; index < _candidateList.Count(); index++)
+            CCandidateListItem* pItem = _candidateList.GetAt(index);
+            SIZE candidateSize = {0, 0};
+            GetTextExtentPoint32(dcHandle, pItem->_ItemString.Get(),
+                static_cast<int>(pItem->_ItemString.GetLength()), &candidateSize);
+            if (pItem->_ShowFindKeyCode && pItem->_FindKeyCode.GetLength())
             {
-                CCandidateListItem* pItem = _candidateList.GetAt(index);
-                SIZE candidateSize = {0, 0};
-                GetTextExtentPoint32(dcHandle, pItem->_ItemString.Get(),
-                    static_cast<int>(pItem->_ItemString.GetLength()), &candidateSize);
-                if (pItem->_ShowFindKeyCode && pItem->_FindKeyCode.GetLength())
-                {
-                    SIZE separatorSize = {0, 0};
-                    SIZE codeSize = {0, 0};
-                    SIZE closingBracketSize = {0, 0};
-                    GetTextExtentPoint32(dcHandle, L" [", 2, &separatorSize);
-                    GetTextExtentPoint32(dcHandle, pItem->_FindKeyCode.Get(),
-                        static_cast<int>(pItem->_FindKeyCode.GetLength()), &codeSize);
-                    GetTextExtentPoint32(dcHandle, L"]", 1, &closingBracketSize);
-                    candidateSize.cx += separatorSize.cx + codeSize.cx + closingBracketSize.cx;
-                }
-                candidateWidth = max(candidateWidth, candidateSize.cx);
+                SIZE separatorSize = {0, 0};
+                SIZE codeSize = {0, 0};
+                SIZE closingBracketSize = {0, 0};
+                GetTextExtentPoint32(dcHandle, L" [", 2, &separatorSize);
+                GetTextExtentPoint32(dcHandle, pItem->_FindKeyCode.Get(),
+                    static_cast<int>(pItem->_FindKeyCode.GetLength()), &codeSize);
+                GetTextExtentPoint32(dcHandle, L"]", 1, &closingBracketSize);
+                candidateSize.cx += separatorSize.cx + codeSize.cx + closingBracketSize.cx;
             }
-            SelectObject(dcHandle, hFontOld);
-            ReleaseDC(_GetWnd(), dcHandle);
-
-            _cxTitle = StringPosition * _TextMetric.tmAveCharWidth + candidateWidth +
-                2 * GetSystemMetrics(SM_CXVSCROLL) + CANDWND_BORDER_WIDTH +
-                2 * GetSystemMetrics(SM_CXFRAME);
-            _cxTitle = max(_cxTitle, _TextMetric.tmMaxCharWidth * static_cast<int>(_wndWidth));
+            candidateWidth = max(candidateWidth, candidateSize.cx);
         }
+
+        SelectObject(dcHandle, hFontOld);
+        ReleaseDC(_GetWnd(), dcHandle);
+
+        _cxTitle = StringPosition * _TextMetric.tmAveCharWidth + candidateWidth +
+            2 * GetSystemMetrics(SM_CXVSCROLL) + CANDWND_BORDER_WIDTH +
+            2 * GetSystemMetrics(SM_CXFRAME);
     }
 
     int candidateListPageCnt = _pIndexRange->Count();
@@ -282,7 +276,6 @@ LRESULT CALLBACK CCandidateWindow::_WindowProcCallback(_In_ HWND wndHandle, UINT
                 HFONT hFontOld = (HFONT)SelectObject(dcHandle, Global::defaultlFontHandle);
                 GetTextMetrics(dcHandle, &_TextMetric);
 
-                _cxTitle = _TextMetric.tmMaxCharWidth * _wndWidth;
                 SelectObject(dcHandle, hFontOld);
                 ReleaseDC(wndHandle, dcHandle);
             }

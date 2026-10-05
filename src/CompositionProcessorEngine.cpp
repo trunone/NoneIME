@@ -125,8 +125,6 @@ CCompositionProcessorEngine::CCompositionProcessorEngine()
 
     _candidateListPhraseModifier = 0;
 
-    _candidateWndWidth = CAND_WIDTH;
-
     InitKeyStrokeTable();
 }
 
@@ -901,7 +899,6 @@ void CCompositionProcessorEngine::SetupConfiguration()
     _hasMakePhraseFromText = TRUE;
     _isKeystrokeSort = TRUE;
     Global::LoadCandidateWindowSettings();
-    _candidateWndWidth = Global::candidateWindowWidth;
 
     SetInitialCandidateListRange();
 

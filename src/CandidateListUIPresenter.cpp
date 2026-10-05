@@ -141,7 +141,7 @@ HRESULT CNoneIME::_HandleCandidateWorker(TfEditCookie ec, _In_ ITfContext *pCont
         {
             if (pTempCandListUIPresenter)
             {
-                hrStartCandidateList = pTempCandListUIPresenter->_StartCandidateList(_tfClientId, pDocumentMgr, pContext, ec, pRange, _pCompositionProcessorEngine->GetCandidateWindowWidth());
+                hrStartCandidateList = pTempCandListUIPresenter->_StartCandidateList(_tfClientId, pDocumentMgr, pContext, ec, pRange);
             } 
 
             pRange->Release();
@@ -762,7 +762,7 @@ STDAPI CCandidateListUIPresenter::FinalizeExactCompositionString()
 //
 //----------------------------------------------------------------------------
 
-HRESULT CCandidateListUIPresenter::_StartCandidateList(TfClientId tfClientId, _In_ ITfDocumentMgr *pDocumentMgr, _In_ ITfContext *pContextDocument, TfEditCookie ec, _In_ ITfRange *pRangeComposition, UINT wndWidth)
+HRESULT CCandidateListUIPresenter::_StartCandidateList(TfClientId tfClientId, _In_ ITfDocumentMgr *pDocumentMgr, _In_ ITfContext *pContextDocument, TfEditCookie ec, _In_ ITfRange *pRangeComposition)
 {
 	pDocumentMgr;tfClientId;
 
@@ -775,7 +775,7 @@ HRESULT CCandidateListUIPresenter::_StartCandidateList(TfClientId tfClientId, _I
 
     BeginUIElement();
 
-    hr = MakeCandidateWindow(pContextDocument, wndWidth);
+    hr = MakeCandidateWindow(pContextDocument);
     if (FAILED(hr))
     {
         goto Exit;
@@ -1264,7 +1264,7 @@ Exit:
     return hr;
 }
 
-HRESULT CCandidateListUIPresenter::MakeCandidateWindow(_In_ ITfContext *pContextDocument, _In_ UINT wndWidth)
+HRESULT CCandidateListUIPresenter::MakeCandidateWindow(_In_ ITfContext *pContextDocument)
 {
     HRESULT hr = S_OK;
 
@@ -1287,7 +1287,7 @@ HRESULT CCandidateListUIPresenter::MakeCandidateWindow(_In_ ITfContext *pContext
         pView->GetWnd(&parentWndHandle);
     }
 
-    if (!_pCandidateWnd->_Create(_atom, wndWidth, parentWndHandle))
+    if (!_pCandidateWnd->_Create(_atom, parentWndHandle))
     {
         hr = E_OUTOFMEMORY;
         goto Exit;

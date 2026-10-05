@@ -110,7 +110,6 @@ extern LONG dllRefCount;
 extern CRITICAL_SECTION CS;
 extern HFONT defaultlFontHandle;  // Global font object we use everywhere
 extern UINT candidateFontSize;
-extern UINT candidateWindowWidth;
 extern COLORREF candidateHighlightColor;
 void LoadCandidateWindowSettings();
 

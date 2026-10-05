@@ -70,7 +70,7 @@ public:
     STDMETHODIMP ShowCandidateNumbers(_Out_ BOOL *pIsShow); 
     STDMETHODIMP FinalizeExactCompositionString();
 
-    virtual HRESULT _StartCandidateList(TfClientId tfClientId, _In_ ITfDocumentMgr *pDocumentMgr, _In_ ITfContext *pContextDocument, TfEditCookie ec, _In_ ITfRange *pRangeComposition, UINT wndWidth);
+    virtual HRESULT _StartCandidateList(TfClientId tfClientId, _In_ ITfDocumentMgr *pDocumentMgr, _In_ ITfContext *pContextDocument, TfEditCookie ec, _In_ ITfRange *pRangeComposition);
     void _EndCandidateList();
 
     void _SetText(_In_ CNoneImeArray<CCandidateListItem> *pCandidateList, BOOL isAddFindKeyCode);
@@ -114,7 +114,7 @@ private:
     HRESULT BeginUIElement();
     HRESULT EndUIElement();
 
-    HRESULT MakeCandidateWindow(_In_ ITfContext *pContextDocument, _In_ UINT wndWidth);
+    HRESULT MakeCandidateWindow(_In_ ITfContext *pContextDocument);
     void DisposeCandidateWindow();
 
     void AddCandidateToCandidateListUI(_In_ CNoneImeArray<CCandidateListItem> *pCandidateList, BOOL isAddFindKeyCode);

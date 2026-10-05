@@ -293,7 +293,7 @@ HRESULT CNoneIME::_CreateAndStartCandidate(_In_ CCompositionProcessorEngine *pCo
             ITfRange* pRange = nullptr;
             if (SUCCEEDED(_pComposition->GetRange(&pRange)))
             {
-                hr = _pCandidateListUIPresenter->_StartCandidateList(_tfClientId, pDocumentMgr, pContext, ec, pRange, pCompositionProcessorEngine->GetCandidateWindowWidth());
+                hr = _pCandidateListUIPresenter->_StartCandidateList(_tfClientId, pDocumentMgr, pContext, ec, pRange);
                 pRange->Release();
             }
             pDocumentMgr->Release();
@@ -428,7 +428,7 @@ HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pC
             ITfRange* pRange = nullptr;
             if (SUCCEEDED(_pComposition->GetRange(&pRange)))
             {
-                hr = _pCandidateListUIPresenter->_StartCandidateList(_tfClientId, pDocumentMgr, pContext, ec, pRange, pCompositionProcessorEngine->GetCandidateWindowWidth());
+                hr = _pCandidateListUIPresenter->_StartCandidateList(_tfClientId, pDocumentMgr, pContext, ec, pRange);
                 pRange->Release();
             }
             pDocumentMgr->Release();

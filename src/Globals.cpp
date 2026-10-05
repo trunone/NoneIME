@@ -20,7 +20,6 @@ LONG dllRefCount = -1;
 CRITICAL_SECTION CS;
 HFONT defaultlFontHandle;				// Global font object we use everywhere
 UINT candidateFontSize = 14;
-UINT candidateWindowWidth = CAND_WIDTH;
 COLORREF candidateHighlightColor = CANDWND_SELECTED_BK_COLOR;
 
 void LoadCandidateWindowSettings()
@@ -44,9 +43,7 @@ void LoadCandidateWindowSettings()
     }
 
     UINT fontSize = GetPrivateProfileIntW(L"CandidateWindow", L"CandidateFontSize", 14, iniPath);
-    UINT windowWidth = GetPrivateProfileIntW(L"CandidateWindow", L"WindowWidth", CAND_WIDTH, iniPath);
     candidateFontSize = min(max(fontSize, 6), 72);
-    candidateWindowWidth = min(max(windowWidth, 4), 40);
 
     WCHAR colorText[32] = {};
     GetPrivateProfileStringW(L"CandidateWindow", L"HighlightColor", L"0078D7", colorText, ARRAYSIZE(colorText), iniPath);

@@ -20,7 +20,7 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 
 腳本會尋找 MSBuild 並建置 `NoneIME.sln`。DLL、執行時字典及 `NoneIME.ini` 會輸出至 `bin/<Platform>/<Configuration>/`，中間檔案則位於 `obj/<Platform>/<Configuration>/`。
 
-可在 DLL 同層的 INI 檔 `[CandidateWindow]` 區段調整 `CandidateFontSize`（字級，點）、`WindowWidth`（候選視窗寬度，字元格數）及 `HighlightColor`（RGB 色碼，例如 `0078D7`）。設定會在輸入法初始化時讀取。建置不會自動安裝或註冊輸入法。
+可在 DLL 同層的 INI 檔 `[CandidateWindow]` 區段調整 `CandidateFontSize`（字級，點）及 `HighlightColor`（RGB 色碼，例如 `0078D7`）。候選視窗使用固定最小寬度，較長的候選內容會自動加寬。設定會在輸入法初始化時讀取。建置不會自動安裝或註冊輸入法。
 
 ## 安裝與移除
 
