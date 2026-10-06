@@ -61,12 +61,6 @@ enum KEYSTROKE_FUNCTION
     FUNCTION_MOVE_PAGE_TOP,
     FUNCTION_MOVE_PAGE_BOTTOM,
 
-    // Function Double/Single byte
-    FUNCTION_DOUBLE_SINGLE_BYTE,
-
-    // Function Punctuation
-    FUNCTION_PUNCTUATION,
-
     FUNCTION_MOVE_PAGE_DOWN_CYCLE
 };
 
@@ -89,12 +83,6 @@ struct _KEYSTROKE_STATE
 {
     KEYSTROKE_CATEGORY Category;
     KEYSTROKE_FUNCTION Function;
-};
-
-struct _PUNCTUATION
-{
-    WCHAR _Code;
-    WCHAR _Punctuation;
 };
 
 BOOL CLSIDToString(REFGUID refGUID, _Out_writes_ (39) WCHAR *pCLSIDString);
@@ -249,29 +237,3 @@ struct CCandidateListItem
 	}
 };
 
-class CPunctuationPair
-{
-public:
-    CPunctuationPair();
-    CPunctuationPair(WCHAR code, WCHAR punctuation, WCHAR pair);
-
-    struct _PUNCTUATION _punctuation;
-    WCHAR _pairPunctuation;
-    BOOL _isPairToggle;
-};
-
-class CPunctuationNestPair
-{
-public:
-    CPunctuationNestPair();
-    CPunctuationNestPair(WCHAR wchCode_begin, WCHAR wch_begin, WCHAR wchPair_begin,
-        WCHAR wchCode_end,   WCHAR wch_end,   WCHAR wchPair_end);
-
-    struct _PUNCTUATION _punctuation_begin;
-    WCHAR _pairPunctuation_begin;
-
-    struct _PUNCTUATION _punctuation_end;
-    WCHAR _pairPunctuation_end;
-
-    int _nestCount;
-};

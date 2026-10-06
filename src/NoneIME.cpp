@@ -323,12 +323,6 @@ STDAPI CNoneIME::Deactivate()
     CCompartment CompartmentKeyboardOpen(_pThreadMgr, _tfClientId, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE);
     CompartmentKeyboardOpen._ClearCompartment();
 
-    CCompartment CompartmentDoubleSingleByte(_pThreadMgr, _tfClientId, Global::NoneIMEGuidCompartmentDoubleSingleByte);
-    CompartmentDoubleSingleByte._ClearCompartment();
-
-    CCompartment CompartmentPunctuation(_pThreadMgr, _tfClientId, Global::NoneIMEGuidCompartmentPunctuation);
-    CompartmentDoubleSingleByte._ClearCompartment();
-
     if (_pThreadMgr != nullptr)
     {
         _pThreadMgr->Release();

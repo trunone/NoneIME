@@ -88,12 +88,6 @@ protected:
     // HandleKeyArrow
     virtual HRESULT HandleKeyArrow(KeyHandlerEditSessionDTO dto);
 
-    // HandleKeyDoubleSingleByte
-    virtual HRESULT HandleKeyDoubleSingleByte(KeyHandlerEditSessionDTO dto);
-
-    // HandleKeyPunctuation
-    virtual HRESULT HandleKeyPunctuation(KeyHandlerEditSessionDTO dto);
-
     // HandleKeySelectByNumber
     virtual HRESULT HandleKeySelectByNumber(KeyHandlerEditSessionDTO dto);
 
@@ -136,12 +130,6 @@ protected:
 
     // HandleArrowKey
     HRESULT HandleKeyArrow(KeyHandlerEditSessionDTO dto);
-
-    // HandleKeyDoubleSingleByte
-    HRESULT HandleKeyDoubleSingleByte(KeyHandlerEditSessionDTO dto);
-
-    // HandleKeyCompositionPunctuation
-    HRESULT HandleKeyPunctuation(KeyHandlerEditSessionDTO dto);
 };
 
 class CKeyStateCandidate : public CKeyStateCategory
@@ -224,12 +212,6 @@ protected:
 
     //_HandleNullArrowKey
     HRESULT HandleKeyArrow(KeyHandlerEditSessionDTO dto) { return __super::HandleKeyArrow(dto); };
-
-    // HandleKeyDoubleSingleByte
-    HRESULT HandleKeyDoubleSingleByte(KeyHandlerEditSessionDTO dto) { return __super::HandleKeyDoubleSingleByte(dto); };
-
-    // HandleKeyPunctuation
-    HRESULT HandleKeyPunctuation(KeyHandlerEditSessionDTO dto) { return __super::HandleKeyPunctuation(dto); };
 
     //_HandleNullCandidateSelectByNumber
     HRESULT HandleKeySelectByNumber(KeyHandlerEditSessionDTO dto) { return __super::HandleKeySelectByNumber(dto); };

@@ -18,10 +18,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 IDIS_NONEIME           ICON                    "image\\NoneIME.ico"
 IDI_IME_MODE_ON         ICON                    "image\\ImeModeOn.ico"
 IDI_IME_MODE_OFF        ICON                    "image\\ImeModeOff.ico"
-IDI_DOUBLE_SINGLE_BYTE_ON ICON                    "image\\DoubleSingleByteOn.ico"
-IDI_DOUBLE_SINGLE_BYTE_OFF ICON                    "image\\DoubleSingleByteOff.ico"
-IDI_PUNCTUATION_ON      ICON                    "image\\PunctuationOn.ico"
-IDI_PUNCTUATION_OFF     ICON                    "image\\PunctuationOff.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -101,8 +98,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_IME_MODE            "Chinese/English input (Shift)"
-    IDS_DOUBLE_SINGLE_BYTE  "Double/Single byte (Shift+Space)"
-    IDS_PUNCTUATION         "Chinese/English punctuation (Ctrl+.)"
 END
 
 #endif    // English (United States) resources

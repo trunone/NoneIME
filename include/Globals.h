@@ -116,8 +116,6 @@ void LoadCandidateWindowSettings();
 extern const CLSID NoneIMECLSID;
 extern const CLSID NoneIMEGuidProfile;
 extern const CLSID NoneIMEGuidImeModePreserveKey;
-extern const CLSID NoneIMEGuidDoubleSingleBytePreserveKey;
-extern const CLSID NoneIMEGuidPunctuationPreserveKey;
 
 LRESULT CALLBACK ThreadKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
 BOOL CheckModifiers(UINT uModCurrent, UINT uMod);
@@ -128,15 +126,7 @@ extern BOOL IsShiftKeyDownOnly;
 extern BOOL IsControlKeyDownOnly;
 extern BOOL IsAltKeyDownOnly;
 
-extern const GUID NoneIMEGuidCompartmentDoubleSingleByte;
-extern const GUID NoneIMEGuidCompartmentPunctuation;
-
-extern const WCHAR FullWidthCharTable[];
-extern const struct _PUNCTUATION PunctuationTable[14];
-
 extern const GUID NoneIMEGuidLangBarIMEMode;
-extern const GUID NoneIMEGuidLangBarDoubleSingleByte;
-extern const GUID NoneIMEGuidLangBarPunctuation;
 
 extern const GUID NoneIMEGuidDisplayAttributeInput;
 extern const GUID NoneIMEGuidDisplayAttributeConverted;
@@ -151,15 +141,5 @@ extern const WCHAR ImeModeDescription[];
 extern const int ImeModeOnIcoIndex;
 extern const int ImeModeOffIcoIndex;
 
-extern const WCHAR DoubleSingleByteDescription[];
-extern const int DoubleSingleByteOnIcoIndex;
-extern const int DoubleSingleByteOffIcoIndex;
-
-extern const WCHAR PunctuationDescription[];
-extern const int PunctuationOnIcoIndex;
-extern const int PunctuationOffIcoIndex;
-
 extern const WCHAR LangbarImeModeDescription[];
-extern const WCHAR LangbarDoubleSingleByteDescription[];
-extern const WCHAR LangbarPunctuationDescription[];
 }
