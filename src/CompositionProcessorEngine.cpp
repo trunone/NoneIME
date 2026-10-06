@@ -402,7 +402,10 @@ void CCompositionProcessorEngine::GetCandidateList(_Inout_ CNoneImeArray<CCandid
     {
         CStringRange homophoneKeyCode;
         homophoneKeyCode.Set(_keystrokeBuffer.Get() + 1, _keystrokeBuffer.GetLength() - 1);
-        _pTableDictionaryEngine->CollectHomophones(&homophoneKeyCode, pCandidateList);
+        if (!isIncrementalWordSearch)
+        {
+            _pTableDictionaryEngine->CollectHomophones(&homophoneKeyCode, pCandidateList);
+        }
         return;
     }
 
@@ -1633,8 +1636,16 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCH
     {
         if (pKeyState)
         {
-            pKeyState->Category = CATEGORY_CANDIDATE;
-            pKeyState->Function = FUNCTION_MOVE_PAGE_DOWN_CYCLE;
+            if (candidateMode == CANDIDATE_ORIGINAL)
+            {
+                pKeyState->Category = CATEGORY_CANDIDATE;
+                pKeyState->Function = FUNCTION_MOVE_PAGE_DOWN_CYCLE;
+            }
+            else
+            {
+                pKeyState->Category = CATEGORY_COMPOSING;
+                pKeyState->Function = FUNCTION_CONVERT;
+            }
         }
         return TRUE;
     }
