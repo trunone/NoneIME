@@ -40,7 +40,13 @@ private:
 
     DWORD_PTR GetBufferInWCharLength()
     {
-        return (_pFile->GetFileSize() / sizeof(WCHAR)) - _charIndex;     // in char count as a returned length.
+        if (!_pFile->GetReadBufferPointer())
+        {
+            return 0;
+        }
+
+        DWORD_PTR characterCount = _pFile->GetFileSize() / sizeof(WCHAR);
+        return characterCount > _charIndex ? characterCount - _charIndex : 0;
     }
 
     const WCHAR* GetBufferInWChar()

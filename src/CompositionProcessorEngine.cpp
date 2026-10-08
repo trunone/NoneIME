@@ -795,47 +795,37 @@ BOOL CCompositionProcessorEngine::InitLanguageBar(_In_ CLangBarItemButton *pLang
 
 BOOL CCompositionProcessorEngine::SetupDictionaryFile()
 {	
-    // Not yet registered
-    // Register CFileMapping
     WCHAR wszFileName[MAX_PATH] = {'\0'};
     DWORD cchA = GetModuleFileName(Global::dllInstanceHandle, wszFileName, ARRAYSIZE(wszFileName));
-    size_t iDicFileNameLen = cchA + wcslen(TEXTSERVICE_DIC);
-    WCHAR *pwszFileName = new (std::nothrow) WCHAR[iDicFileNameLen + 1];
-    if (!pwszFileName)
+    if (cchA == 0 || cchA >= ARRAYSIZE(wszFileName))
     {
-        goto ErrorExit;
-    }
-    *pwszFileName = L'\0';
-
-    // find the last '/'
-    while (cchA--)
-    {
-        WCHAR wszChar = wszFileName[cchA];
-        if (wszChar == '\\' || wszChar == '/')
-        {
-            StringCchCopyN(pwszFileName, iDicFileNameLen + 1, wszFileName, cchA + 1);
-            StringCchCatN(pwszFileName, iDicFileNameLen + 1, TEXTSERVICE_DIC, wcslen(TEXTSERVICE_DIC));
-            break;
-        }
+        return FALSE;
     }
 
-    // create CFileMapping object
-    if (_pDictionaryFile == nullptr)
+    while (cchA > 0 && wszFileName[cchA - 1] != L'\\' && wszFileName[cchA - 1] != L'/')
     {
-        _pDictionaryFile = new (std::nothrow) CFileMapping();
-        if (!_pDictionaryFile)
-        {
-            goto ErrorExit;
-        }
+        cchA--;
     }
-    if (!(_pDictionaryFile)->CreateFile(pwszFileName, GENERIC_READ, OPEN_EXISTING, FILE_SHARE_READ))
+    if (cchA == 0)
     {
-        goto ErrorExit;
+        return FALSE;
+    }
+    wszFileName[cchA] = L'\0';
+
+    WCHAR dictionaryFileName[MAX_PATH] = {'\0'};
+    if (!Global::GetConfiguredCinPath(dictionaryFileName, ARRAYSIZE(dictionaryFileName)))
+    {
+        return FALSE;
+    }
+
+    _pDictionaryFile = new (std::nothrow) CFile(CP_UTF8);
+    if (!_pDictionaryFile || !_pDictionaryFile->CreateFile(dictionaryFileName, GENERIC_READ, OPEN_EXISTING, FILE_SHARE_READ))
+    {
+        return FALSE;
     }
 
     WCHAR homophoneFileName[MAX_PATH] = { L'\0' };
-    size_t dictionaryDirectoryLength = wcslen(pwszFileName) - wcslen(TEXTSERVICE_DIC);
-    if (SUCCEEDED(StringCchCopyN(homophoneFileName, ARRAYSIZE(homophoneFileName), pwszFileName, dictionaryDirectoryLength)) &&
+    if (SUCCEEDED(StringCchCopyW(homophoneFileName, ARRAYSIZE(homophoneFileName), wszFileName)) &&
         SUCCEEDED(StringCchCatW(homophoneFileName, ARRAYSIZE(homophoneFileName), TEXTSERVICE_HOMOPHONE_DIC)))
     {
         _pHomophoneDictionaryFile = new (std::nothrow) CFileMapping();
@@ -850,17 +840,10 @@ BOOL CCompositionProcessorEngine::SetupDictionaryFile()
     _pTableDictionaryEngine = new (std::nothrow) CTableDictionaryEngine(GetLocale(), _pDictionaryFile, _pHomophoneDictionaryFile);
     if (!_pTableDictionaryEngine)
     {
-        goto ErrorExit;
+        return FALSE;
     }
 
-    delete []pwszFileName;
     return TRUE;
-ErrorExit:
-    if (pwszFileName)
-    {
-        delete []pwszFileName;
-    }
-    return FALSE;
 }
 
 //+---------------------------------------------------------------------------

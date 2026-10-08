@@ -21,19 +21,13 @@
     <None Include="NoneIME.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="Dictionary\Boshiamy.txt">
-      <Filter>Dictionary</Filter>
-    </None>
-    <None Include="Dictionary\Boshiamy-source.txt">
+    <None Include="Dictionary\Boshiamy.cin">
       <Filter>Dictionary</Filter>
     </None>
     <None Include="Dictionary\Boshiamy-GPL-3.0.txt">
       <Filter>Dictionary</Filter>
     </None>
     <None Include="Dictionary\Boshiamy-README.md">
-      <Filter>Dictionary</Filter>
-    </None>
-    <None Include="Dictionary\build_boshiamy_table.ps1">
       <Filter>Dictionary</Filter>
     </None>
     <None Include="image\NoneIME.ico">

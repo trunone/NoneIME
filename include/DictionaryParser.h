@@ -47,4 +47,6 @@ protected:
     DWORD_PTR GetOneLine(_In_z_ LPCWSTR pwszBuffer, DWORD_PTR dwBufLen);
 
     LCID _locale;   // used for CompareString
+    BOOL _isCinTable;
+    BOOL _insideCinTable;
 };

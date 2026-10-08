@@ -22,6 +22,8 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 
 可在 DLL 同層的 INI 檔 `[CandidateWindow]` 區段調整 `CandidateFontSize`（字級，點）及 `HighlightColor`（RGB 色碼，例如 `0078D7`）。候選視窗使用固定最小寬度，較長的候選內容會自動加寬。設定會在輸入法初始化時讀取。建置不會自動安裝或註冊輸入法。
 
+可在 `NoneIME.ini` 的 `[Dictionary]` 區段設定 `CinPath`；相對路徑以 DLL/INI 所在目錄為基準，也可指定絕對路徑。預設值為 `Boshiamy.cin`，安裝器也會依此設定檢查碼表是否存在。
+
 ## 安裝與移除
 
 預設將 x64 Debug 版本註冊給目前 Windows 使用者：
@@ -30,7 +32,7 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 ./install.ps1
 ```
 
-可用 `-Configuration Release -Platform x64` 或 `-Platform Win32` 指定其他版本；若要註冊其他位置的 DLL，請使用 `-DllPath`，並將兩個字典檔放在 DLL 同一目錄。移除時請使用對應的參數：
+可用 `-Configuration Release -Platform x64` 或 `-Platform Win32` 指定其他版本；若要註冊其他位置的 DLL，請使用 `-DllPath`，並將 `Boshiamy.cin` 放在 DLL 同一目錄。同音字字典為選用檔案。移除時請使用對應的參數：
 
 ```powershell
 ./uninstall.ps1
@@ -40,13 +42,14 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 
 ## 字典資料
 
-嘸蝦米碼表來源為 [jdh8/ibus-boshiamy](https://github.com/jdh8/ibus-boshiamy)，採用 commit `9a8f5dadd8dbb95b0376ac19c7b03826e64a1bbb` 的資料。`Dictionary` 內含來源碼表及查詢資料；變更來源表後，可重新產生執行時字典：
+嘸蝦米碼表來源為 [jdh8/ibus-boshiamy](https://github.com/jdh8/ibus-boshiamy)，採用 commit `9a8f5dadd8dbb95b0376ac19c7b03826e64a1bbb` 的資料。將上游 UTF-8 `.cin` 檔命名為 `Boshiamy.cin` 放入 `Dictionary`，建置時會直接複製到輸出目錄並由輸入法載入，不需預先轉換：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File Dictionary/build_boshiamy_table.ps1
+Copy-Item C:\data\boshiamy.cin Dictionary\Boshiamy.cin
+./build.ps1 -Configuration Release -Platform x64
 ```
 
-若要重建同音字資料，請從教育部「辭典公眾授權網」下載《重編國語辭典修訂本》資料 ZIP，解壓後使用 `dict_revised_2015_*.xlsx`。產生器以 `Boshiamy.txt` 中各輸入碼的第一個單字候選為基準，依該字在活頁簿中的「注音一式」建立同音字清單；只保留同時存在於嘸蝦米碼表及教育部資料中的字，未收錄字及其他讀音不會混入。請先重建 `Boshiamy.txt`，再執行：
+若要自行重建同音字資料，請先將 `Boshiamy.cin` 放入 `Dictionary`，再從教育部「辭典公眾授權網」下載《重編國語辭典修訂本》資料 ZIP，解壓後使用 `dict_revised_2015_*.xlsx`。產生器直接讀取 CIN 表格，以各輸入碼的第一個候選字為基準，依該字的「注音一式」建立同音字清單；只保留同時存在於嘸蝦米碼表及教育部資料中的字：
 
 ```powershell
 $moeDictionaryWorkbookPath = 'C:\data\dict_revised_2015_20260929.xlsx'

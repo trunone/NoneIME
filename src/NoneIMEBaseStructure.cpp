@@ -203,6 +203,18 @@ BOOL CStringRange::WildcardCompare(LCID locale, _In_ CStringRange* stringWithWil
         return targetString->GetLength() == 0 ? TRUE : FALSE;
     }
 
+    if (targetString->GetLength() == 0)
+    {
+        if (*stringWithWildcard->Get() != L'*')
+        {
+            return FALSE;
+        }
+
+        CStringRange remainingPattern;
+        stringWithWildcard->CharNext(&remainingPattern);
+        return WildcardCompare(locale, &remainingPattern, targetString);
+    }
+
     CStringRange stringWithWildcard_next;
     CStringRange targetString_next;
     stringWithWildcard->CharNext(&stringWithWildcard_next);

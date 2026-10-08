@@ -18,6 +18,8 @@
 CDictionaryParser::CDictionaryParser(LCID locale)
 {
     _locale = locale;
+    _isCinTable = FALSE;
+    _insideCinTable = FALSE;
 }
 
 //---------------------------------------------------------------------
@@ -40,6 +42,79 @@ CDictionaryParser::~CDictionaryParser()
 
 BOOL CDictionaryParser::ParseLine(_In_reads_(dwBufLen) LPCWSTR pwszBuffer, DWORD_PTR dwBufLen, _Out_ CParserStringRange *psrgKeyword, _Inout_opt_ CNoneImeArray<CParserStringRange> *pValue)
 {
+    DWORD_PTR lineStart = 0;
+    while (lineStart < dwBufLen && (pwszBuffer[lineStart] == L' ' || pwszBuffer[lineStart] == L'\t'))
+    {
+        lineStart++;
+    }
+
+    if (dwBufLen - lineStart >= 3 && wcsncmp(pwszBuffer + lineStart, L"###", 3) == 0)
+    {
+        _isCinTable = TRUE;
+        psrgKeyword->Set(pwszBuffer, 0);
+        return TRUE;
+    }
+
+    BOOL isBeginDefinition = dwBufLen - lineStart >= 16 &&
+        wcsncmp(pwszBuffer + lineStart, L"BEGIN_DEFINITION", 16) == 0;
+    BOOL isBeginTable = dwBufLen - lineStart >= 11 &&
+        wcsncmp(pwszBuffer + lineStart, L"BEGIN_TABLE", 11) == 0;
+    if (isBeginDefinition || isBeginTable)
+    {
+        _isCinTable = TRUE;
+        _insideCinTable = isBeginTable;
+        psrgKeyword->Set(pwszBuffer, 0);
+        return TRUE;
+    }
+
+    if (_isCinTable)
+    {
+        if (dwBufLen - lineStart >= 9 && wcsncmp(pwszBuffer + lineStart, L"END_TABLE", 9) == 0)
+        {
+            _insideCinTable = FALSE;
+            psrgKeyword->Set(pwszBuffer, 0);
+            return TRUE;
+        }
+        if (!_insideCinTable || lineStart == dwBufLen || pwszBuffer[lineStart] == L'#')
+        {
+            psrgKeyword->Set(pwszBuffer, 0);
+            return TRUE;
+        }
+
+        DWORD_PTR keyEnd = lineStart;
+        while (keyEnd < dwBufLen && pwszBuffer[keyEnd] != L' ' && pwszBuffer[keyEnd] != L'\t')
+        {
+            keyEnd++;
+        }
+        DWORD_PTR valueStart = keyEnd;
+        while (valueStart < dwBufLen && (pwszBuffer[valueStart] == L' ' || pwszBuffer[valueStart] == L'\t'))
+        {
+            valueStart++;
+        }
+        DWORD_PTR valueEnd = valueStart;
+        while (valueEnd < dwBufLen && pwszBuffer[valueEnd] != L' ' && pwszBuffer[valueEnd] != L'\t')
+        {
+            valueEnd++;
+        }
+        if (keyEnd == lineStart || valueEnd == valueStart)
+        {
+            psrgKeyword->Set(pwszBuffer, 0);
+            return TRUE;
+        }
+
+        psrgKeyword->Set(pwszBuffer + lineStart, keyEnd - lineStart);
+        if (pValue)
+        {
+            CParserStringRange* value = pValue->Append();
+            if (!value)
+            {
+                return FALSE;
+            }
+            value->Set(pwszBuffer + valueStart, valueEnd - valueStart);
+        }
+        return TRUE;
+    }
+
     LPCWSTR pwszKeyWordDelimiter = nullptr;
     pwszKeyWordDelimiter = GetToken(pwszBuffer, dwBufLen, Global::KeywordDelimiter, psrgKeyword);
     if (!(pwszKeyWordDelimiter))
@@ -208,15 +283,12 @@ BOOL CDictionaryParser::RemoveStringDelimiter(_Inout_opt_ CStringRange *pString)
 
 DWORD_PTR CDictionaryParser::GetOneLine(_In_z_ LPCWSTR pwszBuffer, DWORD_PTR dwBufLen)
 {
-    DWORD_PTR dwIndexTrace = 0;     // in char
-
-    if (FAILED(FindChar(L'\r', pwszBuffer, dwBufLen, &dwIndexTrace)))
+    for (DWORD_PTR index = 0; index < dwBufLen; index++)
     {
-        if (FAILED(FindChar(L'\0', pwszBuffer, dwBufLen, &dwIndexTrace)))
+        if (pwszBuffer[index] == L'\r' || pwszBuffer[index] == L'\n' || pwszBuffer[index] == L'\0')
         {
-            return dwBufLen;
+            return index;
         }
     }
-
-    return dwIndexTrace;
+    return dwBufLen;
 }

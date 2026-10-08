@@ -109,7 +109,43 @@ BOOL CFile::SetupReadBuffer()
         return FALSE;
     }
 
-    if (!IsTextUnicode(_pReadBuffer, dwNumberOfByteRead, NULL))
+    if (_codePage == CP_UTF8)
+    {
+        const BYTE* pByteBuffer = (const BYTE*)_pReadBuffer;
+        DWORD byteOffset = dwNumberOfByteRead >= 3 &&
+            pByteBuffer[0] == 0xEF && pByteBuffer[1] == 0xBB && pByteBuffer[2] == 0xBF ? 3 : 0;
+        int wideLength = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
+            (LPCSTR)(pByteBuffer + byteOffset), dwNumberOfByteRead - byteOffset, NULL, 0);
+        if (wideLength <= 0)
+        {
+            delete [] _pReadBuffer;
+            _pReadBuffer = nullptr;
+            return FALSE;
+        }
+
+        LPWSTR pWideBuffer = new (std::nothrow) WCHAR[wideLength];
+        if (!pWideBuffer)
+        {
+            delete [] _pReadBuffer;
+            _pReadBuffer = nullptr;
+            return FALSE;
+        }
+
+        wideLength = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
+            (LPCSTR)(pByteBuffer + byteOffset), dwNumberOfByteRead - byteOffset, pWideBuffer, wideLength);
+        if (wideLength <= 0)
+        {
+            delete [] pWideBuffer;
+            delete [] _pReadBuffer;
+            _pReadBuffer = nullptr;
+            return FALSE;
+        }
+
+        _fileSize = wideLength * sizeof(WCHAR);
+        delete [] _pReadBuffer;
+        _pReadBuffer = pWideBuffer;
+    }
+    else if (!IsTextUnicode(_pReadBuffer, (int)dwNumberOfByteRead, NULL))
     {
         // This is ASCII file.
         // Read file with Unicode conversion.

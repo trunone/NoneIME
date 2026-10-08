@@ -5,32 +5,33 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$dictionaryPath = Join-Path $PSScriptRoot 'Boshiamy.txt'
+$dictionaryPath = Join-Path $PSScriptRoot 'Boshiamy.cin'
 $outputPath = Join-Path $PSScriptRoot 'Boshiamy-Homophones.txt'
-$dictionaryLines = [System.IO.File]::ReadAllLines($dictionaryPath, [System.Text.Encoding]::Unicode)
+$dictionaryLines = [System.IO.File]::ReadAllLines($dictionaryPath, [System.Text.Encoding]::UTF8)
+$tableStart = [Array]::IndexOf($dictionaryLines, 'BEGIN_TABLE')
+if ($tableStart -lt 0) {
+    throw 'The CIN dictionary does not contain BEGIN_TABLE.'
+}
+
 $tableCharacterSet = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
 $codes = New-Object 'System.Collections.Generic.List[string]'
 $firstCharacterByCode = @{}
 $orderedTableCharacters = New-Object 'System.Collections.Generic.List[string]'
-foreach ($line in $dictionaryLines) {
+for ($lineIndex = $tableStart + 1; $lineIndex -lt $dictionaryLines.Length; $lineIndex++) {
+    $line = $dictionaryLines[$lineIndex]
     $line = $line.Trim()
-    if (-not $line) {
+    if ($line -eq 'END_TABLE') {
+        break
+    }
+    if (-not $line -or $line.StartsWith('#')) {
         continue
     }
-    if ($line.StartsWith('#')) {
-        continue
+    $fields = $line -split '\s+'
+    if ($fields.Count -lt 2) {
+        throw "Invalid CIN table record at source line $($lineIndex + 1)."
     }
-
-    $separatorIndex = $line.IndexOf('=')
-    if ($separatorIndex -le 0) {
-        continue
-    }
-
-    $code = $line.Substring(0, $separatorIndex).Trim()
-    $value = $line.Substring($separatorIndex + 1).Trim()
-    if (-not $code -or -not $value) {
-        continue
-    }
+    $code = $fields[0]
+    $value = $fields[1]
 
     if (-not $firstCharacterByCode.ContainsKey($code)) {
         $codes.Add($code)

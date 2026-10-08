@@ -171,7 +171,7 @@ private:
     CCandidateRange _candidateListIndexRange;
     UINT _candidateListPhraseModifier;
 
-    CFileMapping* _pDictionaryFile;
+    CFile* _pDictionaryFile;
 
     static const int OUT_OF_FILE_INDEX = -1;
 };
