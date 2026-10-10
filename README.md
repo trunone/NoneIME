@@ -49,7 +49,7 @@ Copy-Item C:\data\boshiamy.cin Dictionary\Boshiamy.cin
 ./build.ps1 -Configuration Release -Platform x64
 ```
 
-若要自行重建同音字資料，請先將 `Boshiamy.cin` 放入 `Dictionary`，再從教育部「辭典公眾授權網」下載《重編國語辭典修訂本》資料 ZIP，解壓後使用 `dict_revised_2015_*.xlsx`。產生器直接讀取 CIN 表格，以各輸入碼的第一個候選字為基準，依該字的「注音一式」建立同音字清單；只保留同時存在於嘸蝦米碼表及教育部資料中的字：
+若要自行重建同音字資料，請先將 `Boshiamy.cin` 放入 `Dictionary`，再從教育部「辭典公眾授權網」下載《重編國語辭典修訂本》資料 ZIP，解壓後使用 `dict_revised_2015_*.xlsx`。產生器直接讀取 CIN 表格，依教育部資料中的注音建立字元到讀音及讀音到同音字清單的二層索引，只保留同時存在於嘸蝦米碼表及教育部資料中的字，並產生 `Boshiamy-Homophones.bin`：
 
 ```powershell
 $moeDictionaryWorkbookPath = 'C:\data\dict_revised_2015_20260929.xlsx'

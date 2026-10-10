@@ -8,11 +8,12 @@
 #pragma once
 
 #include "BaseDictionaryEngine.h"
+#include "FileMapping.h"
 
 class CTableDictionaryEngine : public CBaseDictionaryEngine
 {
 public:
-    CTableDictionaryEngine(LCID locale, _In_ CFile *pDictionaryFile, _In_opt_ CFile *pHomophoneDictionaryFile = nullptr) : CBaseDictionaryEngine(locale, pDictionaryFile), _pHomophoneDictionaryFile(pHomophoneDictionaryFile) { }
+    CTableDictionaryEngine(LCID locale, _In_ CFile *pDictionaryFile, _In_opt_ CFileMapping *pHomophoneDictionaryFile = nullptr) : CBaseDictionaryEngine(locale, pDictionaryFile), _pHomophoneDictionaryFile(pHomophoneDictionaryFile) { }
     virtual ~CTableDictionaryEngine() { }
 
     // Collect word from phrase string.
@@ -30,5 +31,7 @@ public:
     VOID CollectWordFromConvertedStringForWildcard(_In_ CStringRange *pString, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
 
 private:
-    CFile* _pHomophoneDictionaryFile;
+    VOID CollectHomophonesFromList(_In_ CStringRange *pHomophones, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
+
+    CFileMapping* _pHomophoneDictionaryFile;
 };

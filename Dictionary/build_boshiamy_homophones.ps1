@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $dictionaryPath = Join-Path $PSScriptRoot 'Boshiamy.cin'
-$outputPath = Join-Path $PSScriptRoot 'Boshiamy-Homophones.txt'
+$binaryOutputPath = Join-Path $PSScriptRoot 'Boshiamy-Homophones.bin'
 $dictionaryLines = [System.IO.File]::ReadAllLines($dictionaryPath, [System.Text.Encoding]::UTF8)
 $tableStart = [Array]::IndexOf($dictionaryLines, 'BEGIN_TABLE')
 if ($tableStart -lt 0) {
@@ -14,8 +14,6 @@ if ($tableStart -lt 0) {
 }
 
 $tableCharacterSet = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
-$codes = New-Object 'System.Collections.Generic.List[string]'
-$firstCharacterByCode = @{}
 $orderedTableCharacters = New-Object 'System.Collections.Generic.List[string]'
 for ($lineIndex = $tableStart + 1; $lineIndex -lt $dictionaryLines.Length; $lineIndex++) {
     $line = $dictionaryLines[$lineIndex]
@@ -30,48 +28,10 @@ for ($lineIndex = $tableStart + 1; $lineIndex -lt $dictionaryLines.Length; $line
     if ($fields.Count -lt 2) {
         throw "Invalid CIN table record at source line $($lineIndex + 1)."
     }
-    $code = $fields[0]
     $value = $fields[1]
-
-    if (-not $firstCharacterByCode.ContainsKey($code)) {
-        $codes.Add($code)
-        $firstCharacterByCode[$code] = $value
-    }
 
     if ($value.Length -eq 1 -and $tableCharacterSet.Add($value)) {
         $orderedTableCharacters.Add($value)
-    }
-}
-
-$previousCharactersByCode = @{}
-if (Test-Path $outputPath) {
-    $previousLines = [System.IO.File]::ReadAllLines($outputPath, [System.Text.Encoding]::Unicode)
-    $previousSharedLists = @{}
-    foreach ($line in $previousLines) {
-        if ($line -match '^(@H\d+)=(.*)$') {
-            $previousSharedLists[$matches[1]] = $matches[2]
-        }
-    }
-    foreach ($line in $previousLines) {
-        if ($line -match '^@H') {
-            continue
-        }
-        $separatorIndex = $line.IndexOf('=')
-        if ($separatorIndex -le 0) {
-            continue
-        }
-        $code = $line.Substring(0, $separatorIndex)
-        $value = $line.Substring($separatorIndex + 1)
-        if ($previousSharedLists.ContainsKey($value)) {
-            $value = $previousSharedLists[$value]
-        }
-        $previousCharactersByCode[$code] = New-Object 'System.Collections.Generic.List[string]'
-        foreach ($character in $value.ToCharArray()) {
-            $candidate = [string] $character
-            if (-not [char]::IsWhiteSpace($character) -and -not $previousCharactersByCode[$code].Contains($candidate)) {
-                $previousCharactersByCode[$code].Add($candidate)
-            }
-        }
     }
 }
 
@@ -165,68 +125,76 @@ foreach ($character in $orderedTableCharacters) {
     }
 }
 
-$records = New-Object 'System.Collections.Generic.List[object]'
-foreach ($code in $codes) {
-    $firstCharacter = $firstCharacterByCode[$code]
-    if ($firstCharacter.Length -ne 1 -or -not $primaryReadingByCharacter.ContainsKey($firstCharacter)) {
-        continue
+$poolStream = [System.IO.MemoryStream]::new()
+$poolWriter = [System.IO.BinaryWriter]::new($poolStream, [System.Text.Encoding]::Unicode, $true)
+$poolOffsets = New-Object 'System.Collections.Generic.Dictionary[string, uint32]' ([System.StringComparer]::Ordinal)
+$addPoolString = {
+    param([string] $value)
+    if ($poolOffsets.ContainsKey($value)) {
+        return $poolOffsets[$value]
     }
+    if ($poolStream.Position -gt [uint32]::MaxValue) {
+        throw 'The homophone string pool exceeds the 32-bit offset limit.'
+    }
+    $offset = [uint32] $poolStream.Position
+    $poolWriter.Write([System.Text.Encoding]::Unicode.GetBytes($value))
+    $poolWriter.Write([uint16] 0)
+    $poolOffsets.Add($value, $offset)
+    return $offset
+}
 
-    $reading = $primaryReadingByCharacter[$firstCharacter]
-    if (-not $charactersByReading.ContainsKey($reading)) {
-        continue
+$binaryReadingRecords = New-Object 'System.Collections.Generic.List[object]'
+$sortedReadings = [string[]] @($charactersByReading.Keys)
+[Array]::Sort($sortedReadings, [System.StringComparer]::Ordinal)
+foreach ($reading in $sortedReadings) {
+    $homophoneList = [string]::Concat($charactersByReading[$reading])
+    if ($homophoneList.Length -gt [uint16]::MaxValue) {
+        throw "Homophone list for '$reading' exceeds the 16-bit length limit."
     }
-
-    $homophones = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
-    foreach ($homophone in $charactersByReading[$reading]) {
-        $homophones.Add($homophone) | Out-Null
-    }
-    $orderedHomophones = New-Object 'System.Collections.Generic.List[string]'
-    if ($previousCharactersByCode.ContainsKey($code)) {
-        foreach ($homophone in $previousCharactersByCode[$code]) {
-            if ($homophones.Contains($homophone) -and -not $orderedHomophones.Contains($homophone)) {
-                $orderedHomophones.Add($homophone)
-            }
-        }
-    }
-    foreach ($homophone in $charactersByReading[$reading]) {
-        if (-not $orderedHomophones.Contains($homophone)) {
-            $orderedHomophones.Add($homophone)
-        }
-    }
-
-    $records.Add([PSCustomObject]@{
-        Code = $code
-        Homophones = [string]::Concat($orderedHomophones)
+    $binaryReadingRecords.Add([PSCustomObject]@{
+        Reading = $reading
+        ReadingOffset = [uint32] (& $addPoolString $reading)
+        ListOffset = [uint32] (& $addPoolString $homophoneList)
+        ListLength = [uint16] $homophoneList.Length
     })
 }
 
-$recordCounts = New-Object 'System.Collections.Generic.Dictionary[string, int]' ([System.StringComparer]::Ordinal)
-foreach ($record in $records) {
-    if (-not $recordCounts.ContainsKey($record.Homophones)) {
-        $recordCounts[$record.Homophones] = 0
-    }
-    $recordCounts[$record.Homophones]++
-}
-
-$sharedIds = New-Object 'System.Collections.Generic.Dictionary[string, string]' ([System.StringComparer]::Ordinal)
-$sharedRecords = New-Object 'System.Collections.Generic.List[string]'
-$outputRecords = New-Object 'System.Collections.Generic.List[string]'
-foreach ($record in $records) {
-    if ($recordCounts[$record.Homophones] -gt 1) {
-        if (-not $sharedIds.ContainsKey($record.Homophones)) {
-            $reference = '@H{0:D6}' -f $sharedRecords.Count
-            $sharedIds[$record.Homophones] = $reference
-            $sharedRecords.Add("$reference=$($record.Homophones)")
-        }
-        $outputRecords.Add("$($record.Code)=$($sharedIds[$record.Homophones])")
-    }
-    else {
-        $outputRecords.Add("$($record.Code)=$($record.Homophones)")
+$binaryCharacterRecords = New-Object 'System.Collections.Generic.List[object]'
+foreach ($character in $orderedTableCharacters) {
+    if ($primaryReadingByCharacter.ContainsKey($character)) {
+        $reading = $primaryReadingByCharacter[$character]
+        $binaryCharacterRecords.Add([PSCustomObject]@{
+            Character = [uint16] [char] $character
+            ReadingOffset = [uint32] (& $addPoolString $reading)
+        })
     }
 }
+$sortedCharacters = @($binaryCharacterRecords | Sort-Object Character)
+if ($poolStream.Length -gt [uint32]::MaxValue) {
+    throw 'The homophone string pool exceeds the 32-bit size limit.'
+}
 
-$outputRecords.InsertRange(0, $sharedRecords)
-$contents = [System.String]::Join("`r`n", $outputRecords) + "`r`n"
-[System.IO.File]::WriteAllText($outputPath, $contents, [System.Text.Encoding]::Unicode)
-Write-Output "Wrote $($records.Count) Mandarin homophone records and $($sharedRecords.Count) shared lists to $outputPath"
+$binaryStream = [System.IO.MemoryStream]::new()
+$binaryWriter = [System.IO.BinaryWriter]::new($binaryStream, [System.Text.Encoding]::Unicode, $true)
+$binaryWriter.Write([byte[]] @(0x48, 0x4F, 0x4D, 0x00))
+$binaryWriter.Write([uint16] 1)
+$binaryWriter.Write([uint32] $sortedCharacters.Count)
+$binaryWriter.Write([uint32] $binaryReadingRecords.Count)
+$binaryWriter.Write([uint32] $poolStream.Length)
+$binaryWriter.Write($poolStream.ToArray())
+foreach ($record in $sortedCharacters) {
+    $binaryWriter.Write([uint16] $record.Character)
+    $binaryWriter.Write([uint32] $record.ReadingOffset)
+}
+foreach ($record in $binaryReadingRecords) {
+    $binaryWriter.Write([uint32] $record.ReadingOffset)
+    $binaryWriter.Write([uint32] $record.ListOffset)
+    $binaryWriter.Write([uint16] $record.ListLength)
+}
+[System.IO.File]::WriteAllBytes($binaryOutputPath, $binaryStream.ToArray())
+$poolWriter.Dispose()
+$poolStream.Dispose()
+$binaryWriter.Dispose()
+$binaryStream.Dispose()
+
+Write-Output "Wrote $($binaryCharacterRecords.Count) character readings and $($binaryReadingRecords.Count) Zhuyin homophone lists to $binaryOutputPath"

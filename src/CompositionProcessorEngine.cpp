@@ -836,7 +836,6 @@ BOOL CCompositionProcessorEngine::SetupDictionaryFile()
             _pHomophoneDictionaryFile = nullptr;
         }
     }
-
     _pTableDictionaryEngine = new (std::nothrow) CTableDictionaryEngine(GetLocale(), _pDictionaryFile, _pHomophoneDictionaryFile);
     if (!_pTableDictionaryEngine)
     {

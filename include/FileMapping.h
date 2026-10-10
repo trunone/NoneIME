@@ -7,40 +7,20 @@
 
 #pragma once
 
-#include "File.h"
-
-class CFileMapping : public CFile
+class CFileMapping
 {
 public:
     CFileMapping();
-    virtual ~CFileMapping();
+    ~CFileMapping();
 
     BOOL CreateFile(_In_ PCWSTR pFileName, DWORD desiredAccess, DWORD creationDisposition,
-        DWORD sharedMode = 0, _Inout_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes = nullptr, DWORD flagsAndAttributes = 0, _Inout_opt_ HANDLE templateFileHandle = nullptr)
-
-    {
-        return CFile::CreateFile(pFileName, desiredAccess, creationDisposition,
-            sharedMode, lpSecurityAttributes, flagsAndAttributes, templateFileHandle);
-    }
-
-    BOOL IsEndOfFile()
-    {
-        return CFile::IsEndOfFile();
-    }
-    VOID NextLine()
-    {
-        CFile::NextLine();
-    }
-
-    const WCHAR *GetReadBufferPointer() { return CFile::GetReadBufferPointer(); }
-    DWORD_PTR GetFileSize() { return CFile::GetFileSize(); }
-
-    LPCWSTR GetFileName() { return CFile::GetFileName(); }
-
-protected:
-    BOOL SetupReadBuffer();
+        DWORD sharedMode = 0, _Inout_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes = nullptr, DWORD flagsAndAttributes = 0, _Inout_opt_ HANDLE templateFileHandle = nullptr);
+    const BYTE *GetRawData();
+    DWORD_PTR GetFileSize() const { return _fileSize; }
 
 private:
-    HANDLE _fileMappingHandle;  // file handle for CreateFileMapping
-    const VOID *_pMapBuffer;    // read buffer memory.
+    HANDLE _fileHandle;
+    HANDLE _fileMappingHandle;
+    const VOID *_pMapBuffer;
+    DWORD_PTR _fileSize;
 };

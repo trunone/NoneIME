@@ -7,7 +7,6 @@
 
 #include "Private.h"
 #include "FileMapping.h"
-#include "Globals.h"
 
 //---------------------------------------------------------------------
 //
@@ -15,10 +14,12 @@
 //
 //---------------------------------------------------------------------
 
-CFileMapping::CFileMapping() : CFile()
+CFileMapping::CFileMapping()
 {
+    _fileHandle = nullptr;
     _fileMappingHandle = nullptr;
     _pMapBuffer = nullptr;
+    _fileSize = 0;
 }
 
 //---------------------------------------------------------------------
@@ -27,61 +28,66 @@ CFileMapping::CFileMapping() : CFile()
 //
 //---------------------------------------------------------------------
 
+BOOL CFileMapping::CreateFile(_In_ PCWSTR pFileName, DWORD desiredAccess, DWORD creationDisposition,
+    DWORD sharedMode, _Inout_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD flagsAndAttributes,
+    _Inout_opt_ HANDLE templateFileHandle)
+{
+    _fileHandle = ::CreateFile(pFileName, desiredAccess, sharedMode, lpSecurityAttributes,
+        creationDisposition, flagsAndAttributes, templateFileHandle);
+    if (_fileHandle == INVALID_HANDLE_VALUE)
+    {
+        _fileHandle = nullptr;
+        return FALSE;
+    }
+
+    LARGE_INTEGER fileSize;
+    if (!GetFileSizeEx(_fileHandle, &fileSize) || fileSize.QuadPart < 0)
+    {
+        CloseHandle(_fileHandle);
+        _fileHandle = nullptr;
+        return FALSE;
+    }
+    _fileSize = (DWORD_PTR)fileSize.QuadPart;
+    return TRUE;
+}
+
 CFileMapping::~CFileMapping()
 {
     if (_pMapBuffer)
     {
         UnmapViewOfFile(_pMapBuffer);
         _pMapBuffer = nullptr;
-        _pReadBuffer = nullptr;
     }
     if (_fileMappingHandle)
     {
         CloseHandle(_fileMappingHandle);
         _fileMappingHandle = nullptr;
     }
+    if (_fileHandle)
+    {
+        CloseHandle(_fileHandle);
+        _fileHandle = nullptr;
+    }
 }
 
-//---------------------------------------------------------------------
-//
-// SetupReadBuffer
-//
-//---------------------------------------------------------------------
-
-BOOL CFileMapping::SetupReadBuffer()
+const BYTE *CFileMapping::GetRawData()
 {
-    if (_fileSize > sizeof(WCHAR))
+    if (!_pMapBuffer && _fileSize > 0)
     {
-        //
-        // Read file in file mapping
-        //
         _fileMappingHandle = CreateFileMapping(_fileHandle, NULL, PAGE_READONLY, 0, 0, NULL);
-        if (_fileMappingHandle)
+        if (!_fileMappingHandle)
         {
-            _pMapBuffer = (const WCHAR *)MapViewOfFile(_fileMappingHandle, FILE_MAP_READ, 0, 0, 0);
-            if (_pMapBuffer)
-            {
-                if (IsTextUnicode(_pMapBuffer, (int)_fileSize, NULL))
-                {
-                    _pReadBuffer = (WCHAR*)_pMapBuffer;
+            return nullptr;
+        }
 
-                    // skip Unicode byte order mark
-                    if (*((WCHAR*)_pMapBuffer) == Global::UnicodeByteOrderMark)
-                    {
-                        _pReadBuffer++;
-                        _fileSize--;
-                    }
-                    return TRUE;
-                }
-
-                UnmapViewOfFile(_pReadBuffer);
-                _pReadBuffer = nullptr;
-            }
-
+        _pMapBuffer = MapViewOfFile(_fileMappingHandle, FILE_MAP_READ, 0, 0, 0);
+        if (!_pMapBuffer)
+        {
             CloseHandle(_fileMappingHandle);
             _fileMappingHandle = nullptr;
+            return nullptr;
         }
     }
 
-    return FALSE;
+    return (const BYTE *)_pMapBuffer;
 }

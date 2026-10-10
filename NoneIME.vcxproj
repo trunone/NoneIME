@@ -22,7 +22,7 @@
     <None Include="Dictionary\Boshiamy.cin" />
     <None Include="Dictionary\Boshiamy-GPL-3.0.txt" />
     <None Include="Dictionary\Boshiamy-README.md" />
-    <None Include="Dictionary\Boshiamy-Homophones.txt" />
+    <None Include="Dictionary\Boshiamy-Homophones.bin" />
     <None Include="Dictionary\build_boshiamy_homophones.ps1" />
     <None Include="NoneIME.ini" />
     <None Include="image\DoubleSingleByteOff.ico" />
@@ -273,7 +273,8 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="CopyRuntimeFiles" AfterTargets="Build">
-    <Copy SourceFiles="$(ProjectDir)Dictionary\Boshiamy-Homophones.txt;$(ProjectDir)NoneIME.ini" DestinationFolder="$(TargetDir)" />
+    <Copy SourceFiles="$(ProjectDir)NoneIME.ini" DestinationFolder="$(TargetDir)" />
+    <Copy SourceFiles="$(ProjectDir)Dictionary\Boshiamy-Homophones.bin" DestinationFolder="$(TargetDir)" Condition="Exists('$(ProjectDir)Dictionary\Boshiamy-Homophones.bin')" />
     <Copy SourceFiles="$(ProjectDir)Dictionary\Boshiamy.cin" DestinationFolder="$(TargetDir)" Condition="Exists('$(ProjectDir)Dictionary\Boshiamy.cin')" />
   </Target>
   <ImportGroup Label="ExtensionTargets">
