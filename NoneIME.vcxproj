@@ -48,6 +48,7 @@
     <ClInclude Include="include\GetTextExtentEditSession.h" />
     <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\KeyHandlerEditSession.h" />
+    <ClInclude Include="include\LanguageBar.h" />
     <ClInclude Include="include\Private.h" />
     <ClInclude Include="include\RegKey.h" />
     <ClInclude Include="include\resource.h" />
@@ -84,6 +85,7 @@
     <ClCompile Include="src\KeyEventSink.cpp" />
     <ClCompile Include="src\KeyHandler.cpp" />
     <ClCompile Include="src\KeyHandlerEditSession.cpp" />
+    <ClCompile Include="src\LanguageBar.cpp" />
     <ClCompile Include="src\Register.cpp" />
     <ClCompile Include="src\RegKey.cpp" />
     <ClCompile Include="src\Server.cpp" />

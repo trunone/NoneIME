@@ -47,11 +47,15 @@ STDAPI CNoneIME::OnActivated(_In_ REFCLSID clsid, _In_ REFGUID guidProfile, _In_
 
     if (isActivated)
     {
+        _pCompositionProcessorEngine->ShowAllLanguageBarIcons();
+
         _pCompositionProcessorEngine->ConversionModeCompartmentUpdated(_pThreadMgr);
     }
     else
     {
         _DeleteCandidateList(FALSE, nullptr);
+
+        _pCompositionProcessorEngine->HideAllLanguageBarIcons();
     }
 
     return S_OK;
