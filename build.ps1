@@ -13,6 +13,7 @@ if (-not (Test-Path $solutionPath)) {
 }
 
 $msbuildPath = $null
+$vsInstallPath = $null
 $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
 $toolsetMap = @{
     '14.5' = 'v145'
@@ -30,6 +31,7 @@ if (Test-Path $vswherePath) {
         $candidate = Join-Path $installPath 'MSBuild\Current\Bin\MSBuild.exe'
         if (Test-Path $candidate) {
             $msbuildPath = $candidate
+            $vsInstallPath = $installPath
             $vcToolsRoot = Join-Path $installPath 'VC\Tools\MSVC'
             if (Test-Path $vcToolsRoot) {
                 $toolsetDirs = Get-ChildItem -Path $vcToolsRoot -Directory |
@@ -64,9 +66,22 @@ if (-not $msbuildPath) {
     throw 'MSBuild was not found. Install Visual Studio Build Tools or add MSBuild to PATH.'
 }
 
+if (-not $vsInstallPath -and $msbuildPath) {
+    $dir = Split-Path $msbuildPath -Parent
+    while ($dir) {
+        if (Test-Path (Join-Path $dir 'VC\Auxiliary\Build')) {
+            $vsInstallPath = $dir
+            break
+        }
+        $parentDir = Split-Path $dir -Parent
+        if ($parentDir -eq $dir) { break }
+        $dir = $parentDir
+    }
+}
+
 if (-not $PlatformToolset) {
-    $vcToolsRoot = Join-Path (Split-Path (Split-Path $msbuildPath -Parent) -Parent) 'VC\Tools\MSVC'
-    if (Test-Path $vcToolsRoot) {
+    $vcToolsRoot = if ($vsInstallPath) { Join-Path $vsInstallPath 'VC\Tools\MSVC' } else { $null }
+    if ($vcToolsRoot -and (Test-Path $vcToolsRoot)) {
         $toolsetDirs = Get-ChildItem -Path $vcToolsRoot -Directory |
             Sort-Object { [version]($_.Name) } -Descending
         foreach ($toolsetDir in $toolsetDirs) {
@@ -87,19 +102,51 @@ if (-not $PlatformToolset) {
     throw 'No compatible C++ toolset was found. Install the Desktop development with C++ workload in Visual Studio Build Tools.'
 }
 
-$vcVarsBat = if ($Platform -eq 'x64') {
-    Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\18\BuildTools\VC\Auxiliary\Build\vcvars64.bat'
-} else {
-    Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\18\BuildTools\VC\Auxiliary\Build\vcvars32.bat'
-}
-if (-not (Test-Path $vcVarsBat)) {
-    $vcVarsBat = Join-Path (Split-Path (Split-Path $msbuildPath -Parent) -Parent) 'VC\Auxiliary\Build\vcvars64.bat'
-    if ($Platform -eq 'Win32') {
-        $vcVarsBat = Join-Path (Split-Path (Split-Path $msbuildPath -Parent) -Parent) 'VC\Auxiliary\Build\vcvars32.bat'
+$vcvarsName = if ($Platform -eq 'x64') { 'vcvars64.bat' } else { 'vcvars32.bat' }
+$vcVarsBat = $null
+
+if ($vsInstallPath) {
+    $candidate = Join-Path $vsInstallPath "VC\Auxiliary\Build\$vcvarsName"
+    if (Test-Path $candidate) {
+        $vcVarsBat = $candidate
     }
 }
-if (-not (Test-Path $vcVarsBat)) {
-    throw "Developer environment batch file not found: $vcVarsBat"
+
+if (-not $vcVarsBat -and $msbuildPath) {
+    $dir = Split-Path $msbuildPath -Parent
+    while ($dir) {
+        $candidate = Join-Path $dir "VC\Auxiliary\Build\$vcvarsName"
+        if (Test-Path $candidate) {
+            $vcVarsBat = $candidate
+            break
+        }
+        $parentDir = Split-Path $dir -Parent
+        if ($parentDir -eq $dir) { break }
+        $dir = $parentDir
+    }
+}
+
+if (-not $vcVarsBat) {
+    $programFilesDirs = @(
+        ${env:ProgramFiles},
+        ${env:ProgramFiles(x86)}
+    ) | Where-Object { $_ -and (Test-Path $_) }
+
+    foreach ($pf in $programFilesDirs) {
+        $vsRoot = Join-Path $pf 'Microsoft Visual Studio'
+        if (Test-Path $vsRoot) {
+            $found = Get-ChildItem -Path $vsRoot -Filter $vcvarsName -Recurse -ErrorAction SilentlyContinue |
+                Select-Object -First 1
+            if ($found) {
+                $vcVarsBat = $found.FullName
+                break
+            }
+        }
+    }
+}
+
+if (-not $vcVarsBat -or -not (Test-Path $vcVarsBat)) {
+    throw "Developer environment batch file ($vcvarsName) not found."
 }
 
 cmd /c "call ""$vcVarsBat"" && ""$msbuildPath"" ""$solutionPath"" /t:Build /p:Configuration=$Configuration /p:Platform=$Platform /p:PlatformToolset=$PlatformToolset /nologo"
