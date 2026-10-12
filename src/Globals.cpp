@@ -190,8 +190,6 @@ extern const WCHAR StringDelimiter  = L'\"';
 // defined item in setting file table [PreservedKey] section
 //---------------------------------------------------------------------
 extern const WCHAR ImeModeDescription[] = L"Chinese/English input (Shift)";
-extern const int ImeModeOnIcoIndex = IME_MODE_ON_ICON_INDEX;
-extern const int ImeModeOffIcoIndex = IME_MODE_OFF_ICON_INDEX;
 
 //---------------------------------------------------------------------
 // windows class / titile / atom

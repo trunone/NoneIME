@@ -16,8 +16,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDIS_NONEIME           ICON                    "image\\NoneIME.ico"
-IDI_IME_MODE_ON         ICON                    "image\\ImeModeOn.ico"
-IDI_IME_MODE_OFF        ICON                    "image\\ImeModeOff.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -93,11 +91,6 @@ STRINGTABLE
 BEGIN
     IDIS_NONEIME            "Boshiamy (Traditional Chinese)"
     IDS_DEFAULT_FONT        "Microsoft JhengHei UI"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_IME_MODE            "Chinese/English input (Shift)"
 END
 
 #endif    // English (United States) resources

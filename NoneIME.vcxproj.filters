@@ -33,24 +33,6 @@
     <None Include="image\NoneIME.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="image\ImeModeOn.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="image\ImeModeOff.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="image\DoubleSingleByteOn.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="image\DoubleSingleByteOff.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="image\PunctuationOn.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="image\PunctuationOff.ico">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BaseDictionaryEngine.h">
@@ -117,15 +99,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\NoneIME.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TipCandidateList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\EnumTfCandidates.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TipCandidateString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\KeyStateCategory.h">
@@ -245,15 +218,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\NoneIME.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TipCandidateList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EnumTfCandidates.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TipCandidateString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\KeyStateCategory.cpp">
