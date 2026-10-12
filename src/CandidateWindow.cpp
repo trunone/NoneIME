@@ -254,7 +254,6 @@ LRESULT CALLBACK CCandidateWindow::_WindowProcCallback(_In_ HWND wndHandle, UINT
             // handle mouse message
             _HandleMouseMsg(uMsg, point);
         }
-		// we processes this message, it should return zero. 
         return 0;
 
     case WM_MOUSEACTIVATE:

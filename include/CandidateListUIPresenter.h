@@ -120,7 +120,7 @@ private:
 
     void AddCandidateToCandidateListUI(_In_ CNoneImeArray<CCandidateListItem> *pCandidateList, BOOL isAddFindKeyCode);
 
-    void SetPageIndexWithScrollInfo(_In_ CNoneImeArray<CCandidateListItem> *pCandidateList);
+    void SetPageIndex(_In_ CNoneImeArray<CCandidateListItem> *pCandidateList);
 
 protected:
     CCandidateWindow *_pCandidateWnd;

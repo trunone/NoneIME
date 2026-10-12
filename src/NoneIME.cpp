@@ -81,6 +81,8 @@ CNoneIME::CNoneIME()
 
     _pDocMgrLastFocused = nullptr;
 
+    _pSIPIMEOnOffCompartment = nullptr;
+    _dwSIPIMEOnOffCompartmentSinkCookie = 0;
     _msgWndHandle = nullptr;
 
     _pContext = nullptr;
@@ -155,6 +157,18 @@ STDAPI CNoneIME::QueryInterface(REFIID riid, _Outptr_ void **ppvObj)
     else if (IsEqualIID(riid, IID_ITfThreadFocusSink))
     {
         *ppvObj = (ITfThreadFocusSink *)this;
+    }
+    else if (IsEqualIID(riid, IID_ITfFunctionProvider))
+    {
+        *ppvObj = (ITfFunctionProvider *)this;
+    }
+    else if (IsEqualIID(riid, IID_ITfFunction))
+    {
+        *ppvObj = (ITfFunction *)this;
+    }
+    else if (IsEqualIID(riid, IID_ITfFnGetPreferredTouchKeyboardLayout))
+    {
+        *ppvObj = (ITfFnGetPreferredTouchKeyboardLayout *)this;
     }
 
     if (*ppvObj)
@@ -244,6 +258,11 @@ STDAPI CNoneIME::ActivateEx(ITfThreadMgr *pThreadMgr, TfClientId tfClientId, DWO
         goto ExitError;
     }
 
+    if (!_InitFunctionProviderSink())
+    {
+        goto ExitError;
+    }
+
     if (!_AddTextProcessorEngine())
     {
         goto ExitError;
@@ -291,6 +310,8 @@ STDAPI CNoneIME::Deactivate()
         _isCandidateWithWildcard = FALSE;
     }
 
+    _UninitFunctionProviderSink();
+
     _UninitThreadFocusSink();
 
     _UninitActiveLanguageProfileNotifySink();
@@ -316,4 +337,91 @@ STDAPI CNoneIME::Deactivate()
     }
 
     return S_OK;
+}
+
+//+---------------------------------------------------------------------------
+//
+// ITfFunctionProvider::GetType
+//
+//----------------------------------------------------------------------------
+HRESULT CNoneIME::GetType(__RPC__out GUID *pguid)
+{
+    HRESULT hr = E_INVALIDARG;
+    if (pguid)
+    {
+        *pguid = Global::NoneIMECLSID;
+        hr = S_OK;
+    }
+    return hr;
+}
+
+//+---------------------------------------------------------------------------
+//
+// ITfFunctionProvider::::GetDescription
+//
+//----------------------------------------------------------------------------
+HRESULT CNoneIME::GetDescription(__RPC__deref_out_opt BSTR *pbstrDesc)
+{
+    HRESULT hr = E_INVALIDARG;
+    if (pbstrDesc != nullptr)
+    {
+        *pbstrDesc = nullptr;
+        hr = E_NOTIMPL;
+    }
+    return hr;
+}
+
+//+---------------------------------------------------------------------------
+//
+// ITfFunctionProvider::::GetFunction
+//
+//----------------------------------------------------------------------------
+HRESULT CNoneIME::GetFunction(__RPC__in REFGUID rguid, __RPC__in REFIID riid, __RPC__deref_out_opt IUnknown **ppunk)
+{
+    HRESULT hr = E_NOINTERFACE;
+
+    if ((IsEqualGUID(rguid, GUID_NULL))
+        && (IsEqualGUID(riid, __uuidof(ITfFnSearchCandidateProvider))))
+    {
+        hr = _pITfFnSearchCandidateProvider->QueryInterface(riid, (void**)ppunk);
+    }
+    else if (IsEqualGUID(rguid, GUID_NULL))
+    {
+        hr = QueryInterface(riid, (void **)ppunk);
+    }
+
+    return hr;
+}
+
+//+---------------------------------------------------------------------------
+//
+// ITfFunction::GetDisplayName
+//
+//----------------------------------------------------------------------------
+HRESULT CNoneIME::GetDisplayName(_Out_ BSTR *pbstrDisplayName)
+{
+    HRESULT hr = E_INVALIDARG;
+    if (pbstrDisplayName != nullptr)
+    {
+        *pbstrDisplayName = nullptr;
+        hr = E_NOTIMPL;
+    }
+    return hr;
+}
+
+//+---------------------------------------------------------------------------
+//
+// ITfFnGetPreferredTouchKeyboardLayout::GetLayout
+// The tkblayout will be Optimized layout.
+//----------------------------------------------------------------------------
+HRESULT CNoneIME::GetLayout(_Out_ TKBLayoutType *ptkblayoutType, _Out_ WORD *pwPreferredLayoutId)
+{
+    HRESULT hr = E_INVALIDARG;
+    if ((ptkblayoutType != nullptr) && (pwPreferredLayoutId != nullptr))
+    {
+        *ptkblayoutType = TKBLT_OPTIMIZED;
+        *pwPreferredLayoutId = TKBL_OPT_SIMPLIFIED_CHINESE_PINYIN;
+        hr = S_OK;
+    }
+    return hr;
 }
