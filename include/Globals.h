@@ -14,11 +14,7 @@
 void DllAddRef();
 void DllRelease();
 
-
 namespace Global {
-//---------------------------------------------------------------------
-// inline
-//---------------------------------------------------------------------
 
 inline void SafeRelease(_In_ IUnknown *punk)
 {
@@ -37,7 +33,6 @@ inline void QuickVariantClear(_Inout_ VARIANT *pvar)
 {
     switch (pvar->vt) 
     {
-    // some ovbious VTs that don't need to call VariantClear.
     case VT_EMPTY:
     case VT_NULL:
     case VT_I2:
@@ -57,32 +52,20 @@ inline void QuickVariantClear(_Inout_ VARIANT *pvar)
     case VT_BOOL:
         break;
 
-        // Call release for VT_UNKNOWN.
     case VT_UNKNOWN:
         SafeRelease(pvar->punkVal);
         break;
 
     default:
-        // we call OleAut32 for other VTs.
         VariantClear(pvar);
         break;
     }
     pvar->vt = VT_EMPTY;
 }
 
-//+---------------------------------------------------------------------------
-//
-// IsTooSimilar
-//
-//  Return TRUE if the colors cr1 and cr2 are so similar that they
-//  are hard to distinguish. Used for deciding to use reverse video
-//  selection instead of system selection colors.
-//
-//----------------------------------------------------------------------------
-
 inline BOOL IsTooSimilar(COLORREF cr1, COLORREF cr2)
 {
-    if ((cr1 | cr2) & 0xFF000000)        // One color and/or the other isn't RGB, so algorithm doesn't apply
+    if ((cr1 | cr2) & 0xFF000000)
     {
         return FALSE;
     }
@@ -94,21 +77,15 @@ inline BOOL IsTooSimilar(COLORREF cr1, COLORREF cr2)
     return DeltaR + DeltaG + DeltaB < 80;
 }
 
-//---------------------------------------------------------------------
-// extern
-//---------------------------------------------------------------------
 extern HINSTANCE dllInstanceHandle;
-
 extern ATOM AtomCandidateWindow;
-extern ATOM AtomShadowWindow;
-extern ATOM AtomScrollBarWindow;
 
 BOOL RegisterWindowClass();
 
 extern LONG dllRefCount;
 
 extern CRITICAL_SECTION CS;
-extern HFONT defaultlFontHandle;  // Global font object we use everywhere
+extern HFONT defaultlFontHandle;
 extern UINT candidateFontSize;
 extern COLORREF candidateHighlightColor;
 BOOL GetConfiguredCinPath(_Out_writes_(cchPath) LPWSTR cinPath, size_t cchPath);

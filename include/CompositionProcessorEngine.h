@@ -5,7 +5,6 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-
 #pragma once
 
 #include "sal.h"
@@ -13,7 +12,6 @@
 #include "KeyHandlerEditSession.h"
 #include "NoneIMEBaseStructure.h"
 #include "FileMapping.h"
-#include "Compartment.h"
 #include "define.h"
 
 class CCompositionProcessorEngine
@@ -24,13 +22,11 @@ public:
 
     BOOL SetupLanguageProfile(LANGID langid, REFGUID guidLanguageProfile, _In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId, BOOL isSecureMode, BOOL isComLessMode);
 
-    // Get language profile.
     GUID GetLanguageProfile(LANGID *plangid)
     {
         *plangid = _langid;
         return _guidProfile;
     }
-    // Get locale
     LCID GetLocale()
     {
         return MAKELCID(_langid, SORT_DEFAULT);
@@ -49,64 +45,13 @@ public:
     void GetCandidateList(_Inout_ CNoneImeArray<CCandidateListItem> *pCandidateList, BOOL isIncrementalWordSearch, BOOL isWildcardSearch);
     void GetCandidateStringInConverted(CStringRange &searchString, _In_ CNoneImeArray<CCandidateListItem> *pCandidateList);
 
-    // Preserved key handler
-    void OnPreservedKey(REFGUID rguid, _Out_ BOOL *pIsEaten, _In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId);
-
-    BOOL IsWildcard() { return _isWildcard; }
-    BOOL IsDisableWildcardAtFirst() { return _isDisableWildcardAtFirst; }
-    BOOL IsWildcardChar(WCHAR wch) { return ((IsWildcardOneChar(wch) || IsWildcardAllChar(wch)) ? TRUE : FALSE); }
-    BOOL IsWildcardOneChar(WCHAR wch) { return (wch==L'?' ? TRUE : FALSE); }
-    BOOL IsWildcardAllChar(WCHAR wch) { return (wch==L'*' ? TRUE : FALSE); }
-    BOOL IsMakePhraseFromText() { return _hasMakePhraseFromText; }
-    BOOL IsKeystrokeSort() { return _isKeystrokeSort; }
-
-    // Dictionary engine
     BOOL IsDictionaryAvailable() { return (_pTableDictionaryEngine ? TRUE : FALSE); }
 
-    // Language bar control
-    void SetLanguageBarStatus(DWORD status, BOOL isSet);
-
-    void ConversionModeCompartmentUpdated(_In_ ITfThreadMgr *pThreadMgr);
-
-    void ShowAllLanguageBarIcons();
-    void HideAllLanguageBarIcons();
-
     inline CCandidateRange *GetCandidateListIndexRange() { return &_candidateListIndexRange; }
-    inline UINT GetCandidateListPhraseModifier() { return _candidateListPhraseModifier; }
 
 private:
     void InitKeyStrokeTable();
-    BOOL InitLanguageBar(_In_ CLangBarItemButton *pLanguageBar, _In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId, REFGUID guidCompartment);
 
-    struct _KEYSTROKE;
-    BOOL IsVirtualKeyKeystrokeComposition(UINT uCode, _Out_opt_ _KEYSTROKE_STATE *pKeyState, KEYSTROKE_FUNCTION function);
-    BOOL IsVirtualKeyKeystrokeCandidate(UINT uCode, _In_ _KEYSTROKE_STATE *pKeyState, CANDIDATE_MODE candidateMode, _Out_ BOOL *pfRetCode, _In_ CNoneImeArray<_KEYSTROKE> *pKeystrokeMetric);
-    BOOL IsKeystrokeRange(UINT uCode, _Out_ _KEYSTROKE_STATE *pKeyState, CANDIDATE_MODE candidateMode);
-
-    void SetupKeystroke();
-    void SetupPreserved(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId);
-    void SetupConfiguration();
-    void SetupLanguageBar(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId, BOOL isSecureMode);
-    void SetKeystrokeTable(_Inout_ CNoneImeArray<_KEYSTROKE> *pKeystroke);
-    void CreateLanguageBarButton(DWORD dwEnable, GUID guidLangBar, _In_z_ LPCWSTR pwszDescriptionValue, _In_z_ LPCWSTR pwszTooltipValue, DWORD dwOnIconIndex, DWORD dwOffIconIndex, _Outptr_result_maybenull_ CLangBarItemButton **ppLangBarItemButton, BOOL isSecureMode);
-    void SetInitialCandidateListRange();
-    void SetDefaultCandidateTextFont();
-	void InitializeNoneIMECompartment(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId);
-
-    class XPreservedKey;
-    void SetPreservedKey(const CLSID clsid, TF_PRESERVEDKEY & tfPreservedKey, _In_z_ LPCWSTR pwszDescription, _Out_ XPreservedKey *pXPreservedKey);
-    BOOL InitPreservedKey(_In_ XPreservedKey *pXPreservedKey, _In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId);
-    BOOL CheckShiftKeyOnly(_In_ CNoneImeArray<TF_PRESERVEDKEY> *pTSFPreservedKeyTable);
-
-    static HRESULT CompartmentCallback(_In_ void *pv, REFGUID guidCompartment);
-    void PrivateCompartmentsUpdated(_In_ ITfThreadMgr *pThreadMgr);
-    void KeyboardOpenCompartmentUpdated(_In_ ITfThreadMgr *pThreadMgr);
-
-    
-    BOOL SetupDictionaryFile();
-    CFile* GetDictionaryFile();
-
-private:
     struct _KEYSTROKE
     {
         UINT VirtualKey;
@@ -120,59 +65,32 @@ private:
             Function = FUNCTION_NONE;
         }
     };
-    _KEYSTROKE _keystrokeTable[32];
 
+    BOOL IsVirtualKeyKeystrokeComposition(UINT uCode, _Out_opt_ _KEYSTROKE_STATE *pKeyState, KEYSTROKE_FUNCTION function);
+    BOOL IsVirtualKeyKeystrokeCandidate(UINT uCode, _In_ _KEYSTROKE_STATE *pKeyState, CANDIDATE_MODE candidateMode, _Out_ BOOL *pfRetCode, _In_ CNoneImeArray<_KEYSTROKE> *pKeystrokeMetric);
+    BOOL IsKeystrokeRange(UINT uCode, _Out_ _KEYSTROKE_STATE *pKeyState, CANDIDATE_MODE candidateMode);
+
+    void SetupKeystroke();
+    void SetKeystrokeTable(_Inout_ CNoneImeArray<_KEYSTROKE> *pKeystroke);
+    void SetInitialCandidateListRange();
+
+    BOOL SetupDictionaryFile();
+    CFile* GetDictionaryFile();
+
+private:
     CTableDictionaryEngine* _pTableDictionaryEngine;
     CFileMapping* _pHomophoneDictionaryFile;
     CStringRange _keystrokeBuffer;
 
-    BOOL _hasWildcardIncludedInKeystrokeBuffer;
-
     LANGID _langid;
     GUID _guidProfile;
-    TfClientId  _tfClientId;
+    TfClientId _tfClientId;
 
     CNoneImeArray<_KEYSTROKE> _KeystrokeComposition;
     CNoneImeArray<_KEYSTROKE> _KeystrokeCandidate;
-    CNoneImeArray<_KEYSTROKE> _KeystrokeCandidateWildcard;
-    CNoneImeArray<_KEYSTROKE> _KeystrokeCandidateSymbol;
-    CNoneImeArray<_KEYSTROKE> _KeystrokeSymbol;
 
-    // Preserved key data
-    class XPreservedKey
-    {
-    public:
-        XPreservedKey();
-        ~XPreservedKey();
-        BOOL UninitPreservedKey(_In_ ITfThreadMgr *pThreadMgr);
-
-    public:
-        CNoneImeArray<TF_PRESERVEDKEY> TSFPreservedKeyTable;
-        GUID Guid;
-        LPCWSTR Description;
-    };
-
-    XPreservedKey _PreservedKey_IMEMode;
-
-    // Language bar data
-    CLangBarItemButton* _pLanguageBar_IMEMode;
-
-    // Compartment
-    CCompartment* _pCompartmentConversion;
-    CCompartmentEventSink* _pCompartmentConversionEventSink;
-    CCompartmentEventSink* _pCompartmentKeyboardOpenEventSink;
-
-    // Configuration data
-    BOOL _isWildcard;
-    BOOL _isDisableWildcardAtFirst;
-    BOOL _hasMakePhraseFromText;
-    BOOL _isKeystrokeSort;
     BOOL _isComLessMode;
     CCandidateRange _candidateListIndexRange;
-    UINT _candidateListPhraseModifier;
 
     CFile* _pDictionaryFile;
-
-    static const int OUT_OF_FILE_INDEX = -1;
 };
-

@@ -5,29 +5,14 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-
 #pragma once
 
 #include "KeyHandlerEditSession.h"
 #include "CandidateWindow.h"
-#include "TfTextLayoutSink.h"
 #include "NoneIME.h"
 #include "NoneIMEBaseStructure.h"
 
-class CReadingLine;
-
-//+---------------------------------------------------------------------------
-//
-// CCandidateListUIPresenter
-//
-// ITfCandidateListUIElement / ITfIntegratableCandidateListUIElement is used for 
-// UILess mode support
-// ITfCandidateListUIElementBehavior sends the Selection behavior message to 
-// 3rd party IME.
-//----------------------------------------------------------------------------
-
-class CCandidateListUIPresenter : public CTfTextLayoutSink,
-    public ITfCandidateListUIElementBehavior,
+class CCandidateListUIPresenter : public ITfCandidateListUIElementBehavior,
     public ITfIntegratableCandidateListUIElement
 {
 public:
@@ -87,10 +72,6 @@ public:
     BOOL _MovePage(_In_ int offSet, _In_ BOOL isCycle = FALSE);
 
     void _MoveWindowToTextExt();
-
-    // CTfTextLayoutSink
-    virtual VOID _LayoutChangeNotification(_In_ RECT *lpRect);
-    virtual VOID _LayoutDestroyNotification();
 
     // Event for ITfThreadFocusSink
     virtual HRESULT OnSetThreadFocus();

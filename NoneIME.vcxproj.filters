@@ -56,12 +56,6 @@
     <ClInclude Include="include\BaseDictionaryEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\BaseWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ButtonWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\CandidateWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -92,16 +86,10 @@
     <ClInclude Include="include\FileMapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GetTextExtentEditSession.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\KeyHandlerEditSession.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LanguageBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Private.h">
@@ -113,34 +101,13 @@
     <ClInclude Include="include\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ScrollBarWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ShadowWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\TableDictionaryEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\TfInputProcessorProfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\TfTextLayoutSink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\NoneIME.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SearchCandidateProvider.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TipCandidateList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\EnumTfCandidates.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TipCandidateString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\KeyStateCategory.h">
@@ -160,16 +127,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ActiveLanguageProfileNotifySink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\BaseDictionaryEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BaseWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ButtonWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\CandidateWindow.cpp">
@@ -217,9 +175,6 @@
     <ClCompile Include="src\FileMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GetTextExtentEditSession.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -232,22 +187,13 @@
     <ClCompile Include="src\KeyHandlerEditSession.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\LanguageBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Register.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RegKey.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ScrollBarWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ShadowWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\StartComposition.cpp">
@@ -262,31 +208,10 @@
     <ClCompile Include="src\TfInputProcessorProfile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TfTextLayoutSink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ThreadFocusSink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ThreadMgrEventSink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\NoneIME.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FunctionProviderSink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SearchCandidateProvider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TipCandidateList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EnumTfCandidates.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TipCandidateString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\KeyStateCategory.cpp">

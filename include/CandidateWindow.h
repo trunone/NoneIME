@@ -5,13 +5,9 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-
 #pragma once
 
-#include "private.h"
-#include "BaseWindow.h"
-#include "ShadowWindow.h"
-#include "ScrollBarWindow.h"
+#include "Private.h"
 #include "NoneIMEBaseStructure.h"
 
 enum CANDWND_ACTION
@@ -21,13 +17,14 @@ enum CANDWND_ACTION
 
 typedef HRESULT (*CANDWNDCALLBACK)(void *pv, enum CANDWND_ACTION action);
 
-class CCandidateWindow : public CBaseWindow
+class CCandidateWindow
 {
 public:
     CCandidateWindow(_In_ CANDWNDCALLBACK pfnCallback, _In_ void *pv, _In_ CCandidateRange *pIndexRange, _In_ BOOL isStoreAppMode);
     virtual ~CCandidateWindow();
 
     BOOL _Create(ATOM atom, _In_opt_ HWND parentWndHandle);
+    void _Destroy();
 
     void _Move(int x, int y);
     void _Show(BOOL isShowWnd);
@@ -37,24 +34,10 @@ public:
     VOID _SetSelectedTextColor(_In_ COLORREF crColor);
     VOID _SetFillColor(_In_ HBRUSH hBrush);
 
-    LRESULT CALLBACK _WindowProcCallback(_In_ HWND wndHandle, UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
-    void _OnPaint(_In_ HDC dcHandle, _In_ PAINTSTRUCT *pps);
-    void _OnLButtonDown(POINT pt);
-    void _OnLButtonUp(POINT pt);
-    void _OnMouseMove(POINT pt);
-    void _OnVScroll(DWORD dwSB, _In_ DWORD nPos);
-
     void _AddString(_Inout_ CCandidateListItem *pCandidateItem, _In_ BOOL isAddFindKeyCode);
     void _ClearList();
-    UINT _GetCount()
-    {
-        return _candidateList.Count();
-    }
-    UINT _GetSelection()
-    {
-        return _currentSelection;
-    }
-    void _SetScrollInfo(_In_ int nMax, _In_ int nPage);
+    UINT _GetCount() { return _candidateList.Count(); }
+    UINT _GetSelection() { return _currentSelection; }
 
     DWORD _GetCandidateString(_In_ int iIndex, _Outptr_result_maybenull_z_ const WCHAR **ppwchCandidateString);
     DWORD _GetSelectedCandidateString(_Outptr_result_maybenull_ const WCHAR **ppwchCandidateString);
@@ -70,30 +53,21 @@ public:
     HRESULT _GetCurrentPage(_Inout_ UINT *pCurrentPage);
     HRESULT _GetCurrentPage(_Inout_ int *pCurrentPage);
 
+    HWND _GetWnd() { return _wndHandle; }
+
+    static BOOL _InitWindowClass(_In_ LPCWSTR lpwszClassName, _Out_ ATOM *patom);
+    static void _UninitWindowClass(ATOM atom);
+
 private:
-    void _HandleMouseMsg(_In_ UINT mouseMsg, _In_ POINT point);
-    void _DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT *prc);
-    void _DrawBorder(_In_ HWND wndHandle, _In_ int cx);
-    BOOL _SetSelectionOffset(_In_ int offSet);
+    static LRESULT CALLBACK _WindowProc(_In_ HWND wndHandle, UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+    LRESULT _OnPaint(HWND wndHandle);
+    LRESULT _OnLButtonDown(LPARAM lParam);
+
+    void _DrawList(HDC hdc);
     BOOL _AdjustPageIndexForSelection();
-    HRESULT _CurrentPageHasEmptyItems(_Inout_ BOOL *pfHasEmptyItems);
-
-	// LightDismiss feature support, it will fire messages lightdismiss-related to the light dismiss layout.
-    void _FireMessageToLightDismiss(_In_ HWND wndHandle, _In_ WINDOWPOS *pWndPos);
-
-    BOOL _CreateMainWindow(ATOM atom, _In_opt_ HWND parentWndHandle);
-    BOOL _CreateBackGroundShadowWindow();
-    BOOL _CreateVScrollWindow();
-
-    HRESULT _AdjustPageIndex(_Inout_ UINT & currentPage, _Inout_ UINT & currentPageIndex);
-
-    void _ResizeWindow();
-    void _DeleteShadowWnd();
-    void _DeleteVScrollBarWnd();
-
-    friend COLORREF _AdjustTextColor(_In_ COLORREF crColor, _In_ COLORREF crBkColor);
 
 private:
+    HWND _wndHandle;
     UINT _currentSelection;
     CNoneImeArray<CCandidateListItem> _candidateList;
     CNoneImeArray<UINT> _PageIndex;
@@ -101,20 +75,9 @@ private:
     COLORREF _crTextColor;
     COLORREF _crSelectedTextColor;
     COLORREF _crBkColor;
-    HBRUSH _brshBkColor;
-
-    TEXTMETRIC _TextMetric;
-    int _cyRow;
-    int _cxTitle;
 
     CCandidateRange* _pIndexRange;
-
     CANDWNDCALLBACK _pfnCallback;
     void* _pObj;
-
-    CShadowWindow* _pShadowWnd;
-    CScrollBarWindow* _pVScrollBarWnd;
-
-    BOOL _dontAdjustOnEmptyItemPage;
     BOOL _isStoreAppMode;
 };
