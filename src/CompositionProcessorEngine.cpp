@@ -806,7 +806,10 @@ void CCompositionProcessorEngine::InitializeNoneIMECompartment(_In_ ITfThreadMgr
 {
 	// set initial mode
     CCompartment CompartmentKeyboardOpen(pThreadMgr, tfClientId, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE);
-    CompartmentKeyboardOpen._SetCompartmentBOOL(FALSE);
+    CompartmentKeyboardOpen._SetCompartmentBOOL(TRUE);
+
+    CCompartment CompartmentConversion(pThreadMgr, tfClientId, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION);
+    CompartmentConversion._SetCompartmentDWORD(TF_CONVERSIONMODE_NATIVE);
 }
 //+---------------------------------------------------------------------------
 //
