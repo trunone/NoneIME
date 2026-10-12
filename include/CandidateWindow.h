@@ -10,8 +10,6 @@
 
 #include "private.h"
 #include "BaseWindow.h"
-#include "ShadowWindow.h"
-#include "ScrollBarWindow.h"
 #include "NoneIMEBaseStructure.h"
 
 enum CANDWND_ACTION
@@ -24,7 +22,7 @@ typedef HRESULT (*CANDWNDCALLBACK)(void *pv, enum CANDWND_ACTION action);
 class CCandidateWindow : public CBaseWindow
 {
 public:
-    CCandidateWindow(_In_ CANDWNDCALLBACK pfnCallback, _In_ void *pv, _In_ CCandidateRange *pIndexRange, _In_ BOOL isStoreAppMode);
+    CCandidateWindow(_In_ CANDWNDCALLBACK pfnCallback, _In_ void *pv, _In_ CCandidateRange *pIndexRange);
     virtual ~CCandidateWindow();
 
     BOOL _Create(ATOM atom, _In_opt_ HWND parentWndHandle);
@@ -42,7 +40,6 @@ public:
     void _OnLButtonDown(POINT pt);
     void _OnLButtonUp(POINT pt);
     void _OnMouseMove(POINT pt);
-    void _OnVScroll(DWORD dwSB, _In_ DWORD nPos);
 
     void _AddString(_Inout_ CCandidateListItem *pCandidateItem, _In_ BOOL isAddFindKeyCode);
     void _ClearList();
@@ -54,7 +51,6 @@ public:
     {
         return _currentSelection;
     }
-    void _SetScrollInfo(_In_ int nMax, _In_ int nPage);
 
     DWORD _GetCandidateString(_In_ int iIndex, _Outptr_result_maybenull_z_ const WCHAR **ppwchCandidateString);
     DWORD _GetSelectedCandidateString(_Outptr_result_maybenull_ const WCHAR **ppwchCandidateString);
@@ -82,14 +78,10 @@ private:
     void _FireMessageToLightDismiss(_In_ HWND wndHandle, _In_ WINDOWPOS *pWndPos);
 
     BOOL _CreateMainWindow(ATOM atom, _In_opt_ HWND parentWndHandle);
-    BOOL _CreateBackGroundShadowWindow();
-    BOOL _CreateVScrollWindow();
 
     HRESULT _AdjustPageIndex(_Inout_ UINT & currentPage, _Inout_ UINT & currentPageIndex);
 
     void _ResizeWindow();
-    void _DeleteShadowWnd();
-    void _DeleteVScrollBarWnd();
 
     friend COLORREF _AdjustTextColor(_In_ COLORREF crColor, _In_ COLORREF crBkColor);
 
@@ -112,9 +104,5 @@ private:
     CANDWNDCALLBACK _pfnCallback;
     void* _pObj;
 
-    CShadowWindow* _pShadowWnd;
-    CScrollBarWindow* _pVScrollBarWnd;
-
     BOOL _dontAdjustOnEmptyItemPage;
-    BOOL _isStoreAppMode;
 };

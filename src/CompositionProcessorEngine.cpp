@@ -13,7 +13,6 @@
 #include "TfInputProcessorProfile.h"
 #include "Globals.h"
 #include "Compartment.h"
-#include "LanguageBar.h"
 #include "RegKey.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -106,8 +105,6 @@ CCompositionProcessorEngine::CCompositionProcessorEngine()
     _guidProfile = GUID_NULL;
     _tfClientId = TF_CLIENTID_NULL;
 
-    _pLanguageBar_IMEMode = nullptr;
-
     _pCompartmentConversion = nullptr;
     _pCompartmentKeyboardOpenEventSink = nullptr;
     _pCompartmentConversionEventSink = nullptr;
@@ -136,13 +133,6 @@ CCompositionProcessorEngine::~CCompositionProcessorEngine()
     {
         delete _pTableDictionaryEngine;
         _pTableDictionaryEngine = nullptr;
-    }
-
-    if (_pLanguageBar_IMEMode)
-    {
-        _pLanguageBar_IMEMode->CleanUp();
-        _pLanguageBar_IMEMode->Release();
-        _pLanguageBar_IMEMode = nullptr;
     }
 
     if (_pCompartmentConversion)
@@ -207,7 +197,7 @@ BOOL CCompositionProcessorEngine::SetupLanguageProfile(LANGID langid, REFGUID gu
 
     SetupPreserved(pThreadMgr, tfClientId);
     InitializeNoneIMECompartment(pThreadMgr, tfClientId);
-    SetupLanguageBar(pThreadMgr, tfClientId, isSecureMode);
+    SetupCompartments(pThreadMgr, tfClientId);
     SetupKeystroke();
     SetupConfiguration();
     SetupDictionaryFile();
@@ -721,17 +711,12 @@ void CCompositionProcessorEngine::SetupConfiguration()
 
 //+---------------------------------------------------------------------------
 //
-// SetupLanguageBar
+// SetupCompartments
 //
 //----------------------------------------------------------------------------
 
-void CCompositionProcessorEngine::SetupLanguageBar(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId, BOOL isSecureMode)
+void CCompositionProcessorEngine::SetupCompartments(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
 {
-    DWORD dwEnable = 1;
-    CreateLanguageBarButton(dwEnable, GUID_LBI_INPUTMODE, Global::LangbarImeModeDescription, Global::ImeModeDescription, Global::ImeModeOnIcoIndex, Global::ImeModeOffIcoIndex, &_pLanguageBar_IMEMode, isSecureMode);
-
-    InitLanguageBar(_pLanguageBar_IMEMode, pThreadMgr, tfClientId, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE);
-
     _pCompartmentConversion = new (std::nothrow) CCompartment(pThreadMgr, tfClientId, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION);
     _pCompartmentKeyboardOpenEventSink = new (std::nothrow) CCompartmentEventSink(CompartmentCallback, this);
     _pCompartmentConversionEventSink = new (std::nothrow) CCompartmentEventSink(CompartmentCallback, this);
@@ -746,45 +731,6 @@ void CCompositionProcessorEngine::SetupLanguageBar(_In_ ITfThreadMgr *pThreadMgr
     }
 
     return;
-}
-
-//+---------------------------------------------------------------------------
-//
-// CreateLanguageBarButton
-//
-//----------------------------------------------------------------------------
-
-void CCompositionProcessorEngine::CreateLanguageBarButton(DWORD dwEnable, GUID guidLangBar, _In_z_ LPCWSTR pwszDescriptionValue, _In_z_ LPCWSTR pwszTooltipValue, DWORD dwOnIconIndex, DWORD dwOffIconIndex, _Outptr_result_maybenull_ CLangBarItemButton **ppLangBarItemButton, BOOL isSecureMode)
-{
-	dwEnable;
-
-    if (ppLangBarItemButton)
-    {
-        *ppLangBarItemButton = new (std::nothrow) CLangBarItemButton(guidLangBar, pwszDescriptionValue, pwszTooltipValue, dwOnIconIndex, dwOffIconIndex, isSecureMode);
-    }
-
-    return;
-}
-
-//+---------------------------------------------------------------------------
-//
-// InitLanguageBar
-//
-//----------------------------------------------------------------------------
-
-BOOL CCompositionProcessorEngine::InitLanguageBar(_In_ CLangBarItemButton *pLangBarItemButton, _In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId, REFGUID guidCompartment)
-{
-    if (pLangBarItemButton)
-    {
-        if (pLangBarItemButton->_AddItem(pThreadMgr) == S_OK)
-        {
-            if (pLangBarItemButton->_RegisterCompartment(pThreadMgr, tfClientId, guidCompartment))
-            {
-                return TRUE;
-            }
-        }
-    }
-    return FALSE;
 }
 
 //+---------------------------------------------------------------------------
@@ -1210,16 +1156,6 @@ void CCompositionProcessorEngine::InitKeyStrokeTable()
         _keystrokeTable[index].Modifiers = 0;
         _keystrokeTable[index].Function = FUNCTION_INPUT;
     }
-}
-
-void CCompositionProcessorEngine::ShowAllLanguageBarIcons()
-{
-    SetLanguageBarStatus(TF_LBI_STATUS_HIDDEN, FALSE);
-}
-
-void CCompositionProcessorEngine::HideAllLanguageBarIcons()
-{
-    SetLanguageBarStatus(TF_LBI_STATUS_HIDDEN, TRUE);
 }
 
 void CCompositionProcessorEngine::SetInitialCandidateListRange()

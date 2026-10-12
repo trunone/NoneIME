@@ -59,9 +59,6 @@
     <ClInclude Include="include\BaseWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ButtonWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\CandidateWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -101,9 +98,6 @@
     <ClInclude Include="include\KeyHandlerEditSession.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\LanguageBar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Private.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -111,12 +105,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ScrollBarWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ShadowWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\TableDictionaryEngine.h">
@@ -129,9 +117,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\NoneIME.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SearchCandidateProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\TipCandidateList.h">
@@ -167,9 +152,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BaseWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ButtonWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\CandidateWindow.cpp">
@@ -232,22 +214,13 @@
     <ClCompile Include="src\KeyHandlerEditSession.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\LanguageBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Register.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RegKey.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ScrollBarWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ShadowWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\StartComposition.cpp">
@@ -272,12 +245,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\NoneIME.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FunctionProviderSink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SearchCandidateProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TipCandidateList.cpp">

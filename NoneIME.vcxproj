@@ -37,7 +37,6 @@
   <ItemGroup>
     <ClInclude Include="include\BaseDictionaryEngine.h" />
     <ClInclude Include="include\BaseWindow.h" />
-    <ClInclude Include="include\ButtonWindow.h" />
     <ClInclude Include="include\CandidateListUIPresenter.h" />
     <ClInclude Include="include\CandidateWindow.h" />
     <ClInclude Include="include\Compartment.h" />
@@ -46,7 +45,6 @@
     <ClInclude Include="include\EnumTfCandidates.h" />
     <ClInclude Include="include\KeyStateCategory.h" />
     <ClInclude Include="include\NoneIMEBaseStructure.h" />
-    <ClInclude Include="include\SearchCandidateProvider.h" />
     <ClInclude Include="include\DictionaryParser.h" />
     <ClInclude Include="include\DictionarySearch.h" />
     <ClInclude Include="include\DisplayAttributeInfo.h" />
@@ -57,13 +55,10 @@
     <ClInclude Include="include\GetTextExtentEditSession.h" />
     <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\KeyHandlerEditSession.h" />
-    <ClInclude Include="include\LanguageBar.h" />
     <ClInclude Include="include\Private.h" />
     <ClInclude Include="include\RegKey.h" />
     <ClInclude Include="include\resource.h" />
     <ClInclude Include="include\NoneIME.h" />
-    <ClInclude Include="include\ScrollBarWindow.h" />
-    <ClInclude Include="include\ShadowWindow.h" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\TableDictionaryEngine.h" />
     <ClInclude Include="include\TfInputProcessorProfile.h" />
@@ -75,7 +70,6 @@
     <ClCompile Include="src\ActiveLanguageProfileNotifySink.cpp" />
     <ClCompile Include="src\BaseDictionaryEngine.cpp" />
     <ClCompile Include="src\BaseWindow.cpp" />
-    <ClCompile Include="src\ButtonWindow.cpp" />
     <ClCompile Include="src\CandidateListUIPresenter.cpp" />
     <ClCompile Include="src\CandidateWindow.cpp" />
     <ClCompile Include="src\Compartment.cpp" />
@@ -84,7 +78,6 @@
     <ClCompile Include="src\EnumTfCandidates.cpp" />
     <ClCompile Include="src\KeyStateCategory.cpp" />
     <ClCompile Include="src\NoneIMEBaseStructure.cpp" />
-    <ClCompile Include="src\SearchCandidateProvider.cpp" />
     <ClCompile Include="src\DictionaryParser.cpp" />
     <ClCompile Include="src\DictionarySearch.cpp" />
     <ClCompile Include="src\DisplayAttribute.cpp" />
@@ -96,18 +89,14 @@
     <ClCompile Include="src\EnumDisplayAttributeInfo.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FileMapping.cpp" />
-    <ClCompile Include="src\FunctionProviderSink.cpp" />
     <ClCompile Include="src\GetTextExtentEditSession.cpp" />
     <ClCompile Include="src\Globals.cpp" />
     <ClCompile Include="src\KeyEventSink.cpp" />
     <ClCompile Include="src\KeyHandler.cpp" />
     <ClCompile Include="src\KeyHandlerEditSession.cpp" />
-    <ClCompile Include="src\LanguageBar.cpp" />
     <ClCompile Include="src\Register.cpp" />
     <ClCompile Include="src\RegKey.cpp" />
-    <ClCompile Include="src\ScrollBarWindow.cpp" />
     <ClCompile Include="src\Server.cpp" />
-    <ClCompile Include="src\ShadowWindow.cpp" />
     <ClCompile Include="src\StartComposition.cpp" />
     <ClCompile Include="src\TableDictionaryEngine.cpp" />
     <ClCompile Include="src\NoneIME.cpp" />

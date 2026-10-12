@@ -10,7 +10,6 @@
 #include "KeyHandlerEditSession.h"
 #include "NoneIMEBaseStructure.h"
 
-class CLangBarItemButton;
 class CCandidateListUIPresenter;
 class CCompositionProcessorEngine;
 
@@ -24,9 +23,7 @@ class CNoneIME : public ITfTextInputProcessorEx,
     public ITfCompositionSink,
     public ITfDisplayAttributeProvider,
     public ITfActiveLanguageProfileNotifySink,
-    public ITfThreadFocusSink,
-    public ITfFunctionProvider,
-    public ITfFnGetPreferredTouchKeyboardLayout
+    public ITfThreadFocusSink
 {
 public:
     CNoneIME();
@@ -77,17 +74,6 @@ public:
     STDMETHODIMP OnSetThreadFocus();
     STDMETHODIMP OnKillThreadFocus();
 
-    // ITfFunctionProvider
-    STDMETHODIMP GetType(__RPC__out GUID *pguid);
-    STDMETHODIMP GetDescription(__RPC__deref_out_opt BSTR *pbstrDesc);
-    STDMETHODIMP GetFunction(__RPC__in REFGUID rguid, __RPC__in REFIID riid, __RPC__deref_out_opt IUnknown **ppunk);
-
-    // ITfFunction
-    STDMETHODIMP GetDisplayName(_Out_ BSTR *pbstrDisplayName);
-
-    // ITfFnGetPreferredTouchKeyboardLayout, it is the Optimized layout feature.
-    STDMETHODIMP GetLayout(_Out_ TKBLayoutType *ptkblayoutType, _Out_ WORD *pwPreferredLayoutId);
-
     // CClassFactory factory callback
     static HRESULT CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outptr_ void **ppvObj);
 
@@ -124,7 +110,6 @@ public:
 
     BOOL _IsSecureMode(void) { return (_dwActivateFlags & TF_TMAE_SECUREMODE) ? TRUE : FALSE; }
     BOOL _IsComLess(void) { return (_dwActivateFlags & TF_TMAE_COMLESS) ? TRUE : FALSE; }
-    BOOL _IsStoreAppMode(void) { return (_dwActivateFlags & TF_TMF_IMMERSIVEMODE) ? TRUE : FALSE; };
 
     CCompositionProcessorEngine* GetCompositionProcessorEngine() { return (_pCompositionProcessorEngine); };
 
@@ -169,8 +154,6 @@ private:
 
     BOOL _InitTextEditSink(_In_ ITfDocumentMgr *pDocMgr);
 
-    void _UpdateLanguageBarOnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus);
-
     BOOL _InitKeyEventSink();
     void _UninitKeyEventSink();
 
@@ -186,9 +169,6 @@ private:
 
     BOOL _InitThreadFocusSink();
     void _UninitThreadFocusSink();
-
-    BOOL _InitFunctionProviderSink();
-    void _UninitFunctionProviderSink();
 
     BOOL _AddTextProcessorEngine();
 
@@ -216,9 +196,6 @@ private:
     // Composition Processor Engine object.
     CCompositionProcessorEngine* _pCompositionProcessorEngine;
 
-    // Language bar item object.
-    CLangBarItemButton* _pLangBarItem;
-
     // the current composition object.
     ITfComposition* _pComposition;
 
@@ -235,13 +212,7 @@ private:
 
     ITfContext* _pContext;
 
-    ITfCompartment* _pSIPIMEOnOffCompartment;
-    DWORD _dwSIPIMEOnOffCompartmentSinkCookie;
-
     HWND _msgWndHandle; 
 
     LONG _refCount;
-
-    // Support the search integration
-    ITfFnSearchCandidateProvider* _pITfFnSearchCandidateProvider;
 };
