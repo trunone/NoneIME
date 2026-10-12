@@ -63,13 +63,20 @@ public:
     // Dictionary engine
     BOOL IsDictionaryAvailable() { return (_pTableDictionaryEngine ? TRUE : FALSE); }
 
+    // Language bar control
+    void SetLanguageBarStatus(DWORD status, BOOL isSet);
+
     void ConversionModeCompartmentUpdated(_In_ ITfThreadMgr *pThreadMgr);
+
+    void ShowAllLanguageBarIcons();
+    void HideAllLanguageBarIcons();
 
     inline CCandidateRange *GetCandidateListIndexRange() { return &_candidateListIndexRange; }
     inline UINT GetCandidateListPhraseModifier() { return _candidateListPhraseModifier; }
 
 private:
     void InitKeyStrokeTable();
+    BOOL InitLanguageBar(_In_ CLangBarItemButton *pLanguageBar, _In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId, REFGUID guidCompartment);
 
     struct _KEYSTROKE;
     BOOL IsVirtualKeyKeystrokeComposition(UINT uCode, _Out_opt_ _KEYSTROKE_STATE *pKeyState, KEYSTROKE_FUNCTION function);
@@ -78,9 +85,10 @@ private:
 
     void SetupKeystroke();
     void SetupPreserved(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId);
-    void SetupCompartments(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId);
     void SetupConfiguration();
+    void SetupLanguageBar(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId, BOOL isSecureMode);
     void SetKeystrokeTable(_Inout_ CNoneImeArray<_KEYSTROKE> *pKeystroke);
+    void CreateLanguageBarButton(DWORD dwEnable, GUID guidLangBar, _In_z_ LPCWSTR pwszDescriptionValue, _In_z_ LPCWSTR pwszTooltipValue, DWORD dwOnIconIndex, DWORD dwOffIconIndex, _Outptr_result_maybenull_ CLangBarItemButton **ppLangBarItemButton, BOOL isSecureMode);
     void SetInitialCandidateListRange();
     void SetDefaultCandidateTextFont();
 	void InitializeNoneIMECompartment(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId);
@@ -96,6 +104,7 @@ private:
 
     
     BOOL SetupDictionaryFile();
+    CFile* GetDictionaryFile();
 
 private:
     struct _KEYSTROKE
@@ -144,6 +153,9 @@ private:
     };
 
     XPreservedKey _PreservedKey_IMEMode;
+
+    // Language bar data
+    CLangBarItemButton* _pLanguageBar_IMEMode;
 
     // Compartment
     CCompartment* _pCompartmentConversion;

@@ -53,6 +53,8 @@ STDAPI CNoneIME::OnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus, _In_ ITfDocumentM
 
     _InitTextEditSink(pDocMgrFocus);
 
+    _UpdateLanguageBarOnSetFocus(pDocMgrFocus);
+
     //
     // We have to hide/unhide candidate list depending on whether they are 
     // associated with pDocMgrFocus.
