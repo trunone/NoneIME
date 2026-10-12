@@ -118,7 +118,6 @@ extern const CLSID NoneIMECLSID;
 extern const CLSID NoneIMEGuidProfile;
 extern const CLSID NoneIMEGuidImeModePreserveKey;
 
-LRESULT CALLBACK ThreadKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
 BOOL CheckModifiers(UINT uModCurrent, UINT uMod);
 BOOL UpdateModifiers(WPARAM wParam, LPARAM lParam);
 

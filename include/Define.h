@@ -17,8 +17,6 @@
 #define IME_MODE_ON_ICON_INDEX      IDI_IME_MODE_ON
 #define IME_MODE_OFF_ICON_INDEX     IDI_IME_MODE_OFF
 
-#define NONEIME_FONT_DEFAULT L"Microsoft JhengHei UI"
-
 //---------------------------------------------------------------------
 // defined Candidated Window
 //---------------------------------------------------------------------
