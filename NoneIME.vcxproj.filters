@@ -33,6 +33,12 @@
     <None Include="image\NoneIME.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="image\ImeModeOn.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="image\ImeModeOff.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BaseDictionaryEngine.h">

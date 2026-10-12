@@ -25,6 +25,8 @@
     <None Include="Dictionary\Boshiamy-Homophones.bin" />
     <None Include="Dictionary\build_boshiamy_homophones.ps1" />
     <None Include="NoneIME.ini" />
+    <None Include="image\ImeModeOff.ico" />
+    <None Include="image\ImeModeOn.ico" />
     <None Include="image\NoneIME.ico" />
     <None Include="NoneIME.def" />
   </ItemGroup>
