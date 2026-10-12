@@ -183,6 +183,7 @@ CCompositionProcessorEngine::~CCompositionProcessorEngine()
 
 BOOL CCompositionProcessorEngine::SetupLanguageProfile(LANGID langid, REFGUID guidLanguageProfile, _In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId, BOOL isSecureMode, BOOL isComLessMode)
 {
+    UNREFERENCED_PARAMETER(isSecureMode);
     BOOL ret = TRUE;
     if ((tfClientId == 0) && (pThreadMgr == nullptr))
     {

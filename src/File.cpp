@@ -93,7 +93,6 @@ BOOL CFile::CreateFile(_In_ PCWSTR pFileName, DWORD desiredAccess,
 
 BOOL CFile::SetupReadBuffer()
 {
-    const WCHAR* pWideBuffer = nullptr;
 
     _pReadBuffer = (const WCHAR *) new (std::nothrow) BYTE[ _fileSize ];
     if (!_pReadBuffer)
