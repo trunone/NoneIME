@@ -96,7 +96,6 @@ private:
 
     
     BOOL SetupDictionaryFile();
-    CFile* GetDictionaryFile();
 
 private:
     struct _KEYSTROKE

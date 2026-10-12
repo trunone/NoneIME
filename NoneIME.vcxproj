@@ -25,12 +25,6 @@
     <None Include="Dictionary\Boshiamy-Homophones.bin" />
     <None Include="Dictionary\build_boshiamy_homophones.ps1" />
     <None Include="NoneIME.ini" />
-    <None Include="image\DoubleSingleByteOff.ico" />
-    <None Include="image\DoubleSingleByteOn.ico" />
-    <None Include="image\ImeModeOff.ico" />
-    <None Include="image\ImeModeOn.ico" />
-    <None Include="image\PunctuationOff.ico" />
-    <None Include="image\PunctuationOn.ico" />
     <None Include="image\NoneIME.ico" />
     <None Include="NoneIME.def" />
   </ItemGroup>
@@ -42,7 +36,6 @@
     <ClInclude Include="include\Compartment.h" />
     <ClInclude Include="include\CompositionProcessorEngine.h" />
     <ClInclude Include="include\Define.h" />
-    <ClInclude Include="include\EnumTfCandidates.h" />
     <ClInclude Include="include\KeyStateCategory.h" />
     <ClInclude Include="include\NoneIMEBaseStructure.h" />
     <ClInclude Include="include\DictionaryParser.h" />
@@ -63,8 +56,6 @@
     <ClInclude Include="include\TableDictionaryEngine.h" />
     <ClInclude Include="include\TfInputProcessorProfile.h" />
     <ClInclude Include="include\TfTextLayoutSink.h" />
-    <ClInclude Include="include\TipCandidateList.h" />
-    <ClInclude Include="include\TipCandidateString.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ActiveLanguageProfileNotifySink.cpp" />
@@ -75,7 +66,6 @@
     <ClCompile Include="src\Compartment.cpp" />
     <ClCompile Include="src\Composition.cpp" />
     <ClCompile Include="src\CompositionProcessorEngine.cpp" />
-    <ClCompile Include="src\EnumTfCandidates.cpp" />
     <ClCompile Include="src\KeyStateCategory.cpp" />
     <ClCompile Include="src\NoneIMEBaseStructure.cpp" />
     <ClCompile Include="src\DictionaryParser.cpp" />
@@ -105,8 +95,6 @@
     <ClCompile Include="src\TfTextLayoutSink.cpp" />
     <ClCompile Include="src\ThreadFocusSink.cpp" />
     <ClCompile Include="src\ThreadMgrEventSink.cpp" />
-    <ClCompile Include="src\TipCandidateList.cpp" />
-    <ClCompile Include="src\TipCandidateString.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="NoneIME.rc" />

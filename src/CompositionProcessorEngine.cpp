@@ -791,17 +791,6 @@ BOOL CCompositionProcessorEngine::SetupDictionaryFile()
     return TRUE;
 }
 
-//+---------------------------------------------------------------------------
-//
-// GetDictionaryFile
-//
-//----------------------------------------------------------------------------
-
-CFile* CCompositionProcessorEngine::GetDictionaryFile()
-{
-    return _pDictionaryFile;
-}
-
 void CCompositionProcessorEngine::InitializeNoneIMECompartment(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
 {
 	// set initial mode

@@ -6,9 +6,6 @@
 #define LANG_ENGLISH                    0x09
 #define IDIS_NONEIME                    12
 #define IDS_DEFAULT_FONT                13
-#define IDS_IME_MODE                    20
-#define IDI_IME_MODE_ON                 21
-#define IDI_IME_MODE_OFF                22
 #define IDR_VERSION2                    107
 
 // Next default values for new objects
