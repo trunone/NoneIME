@@ -10,6 +10,7 @@
 #include "KeyHandlerEditSession.h"
 #include "NoneIMEBaseStructure.h"
 
+class CLangBarItemButton;
 class CCandidateListUIPresenter;
 class CCompositionProcessorEngine;
 
@@ -21,7 +22,11 @@ class CNoneIME : public ITfTextInputProcessorEx,
     public ITfTextEditSink,
     public ITfKeyEventSink,
     public ITfCompositionSink,
-    public ITfDisplayAttributeProvider
+    public ITfDisplayAttributeProvider,
+    public ITfActiveLanguageProfileNotifySink,
+    public ITfThreadFocusSink,
+    public ITfFunctionProvider,
+    public ITfFnGetPreferredTouchKeyboardLayout
 {
 public:
     CNoneIME();
@@ -65,6 +70,24 @@ public:
     STDMETHODIMP EnumDisplayAttributeInfo(__RPC__deref_out_opt IEnumTfDisplayAttributeInfo **ppEnum);
     STDMETHODIMP GetDisplayAttributeInfo(__RPC__in REFGUID guidInfo, __RPC__deref_out_opt ITfDisplayAttributeInfo **ppInfo);
 
+    // ITfActiveLanguageProfileNotifySink
+    STDMETHODIMP OnActivated(_In_ REFCLSID clsid, _In_ REFGUID guidProfile, _In_ BOOL isActivated);
+
+    // ITfThreadFocusSink
+    STDMETHODIMP OnSetThreadFocus();
+    STDMETHODIMP OnKillThreadFocus();
+
+    // ITfFunctionProvider
+    STDMETHODIMP GetType(__RPC__out GUID *pguid);
+    STDMETHODIMP GetDescription(__RPC__deref_out_opt BSTR *pbstrDesc);
+    STDMETHODIMP GetFunction(__RPC__in REFGUID rguid, __RPC__in REFIID riid, __RPC__deref_out_opt IUnknown **ppunk);
+
+    // ITfFunction
+    STDMETHODIMP GetDisplayName(_Out_ BSTR *pbstrDisplayName);
+
+    // ITfFnGetPreferredTouchKeyboardLayout, it is the Optimized layout feature.
+    STDMETHODIMP GetLayout(_Out_ TKBLayoutType *ptkblayoutType, _Out_ WORD *pwPreferredLayoutId);
+
     // CClassFactory factory callback
     static HRESULT CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outptr_ void **ppvObj);
 
@@ -106,9 +129,9 @@ public:
     CCompositionProcessorEngine* GetCompositionProcessorEngine() { return (_pCompositionProcessorEngine); };
 
     // comless helpers
-    static HRESULT CreateInstance(REFCLSID rclsid, REFIID riid, _Outptr_result_maybenull_ LPVOID* ppv, _Out_opt_ HINSTANCE* phInst, BOOL isComLessMode);
-    static HRESULT ComLessCreateInstance(REFGUID rclsid, REFIID riid, _Outptr_result_maybenull_ void **ppv, _Out_opt_ HINSTANCE *phInst);
-    static HRESULT GetComModuleName(REFGUID rclsid, _Out_writes_(cchPath)WCHAR* wchPath, DWORD cchPath);
+    static HRESULT CNoneIME::CreateInstance(REFCLSID rclsid, REFIID riid, _Outptr_result_maybenull_ LPVOID* ppv, _Out_opt_ HINSTANCE* phInst, BOOL isComLessMode);
+    static HRESULT CNoneIME::ComLessCreateInstance(REFGUID rclsid, REFIID riid, _Outptr_result_maybenull_ void **ppv, _Out_opt_ HINSTANCE *phInst);
+    static HRESULT CNoneIME::GetComModuleName(REFGUID rclsid, _Out_writes_(cchPath)WCHAR* wchPath, DWORD cchPath);
 
 private:
     // functions for the composition object.
@@ -146,8 +169,13 @@ private:
 
     BOOL _InitTextEditSink(_In_ ITfDocumentMgr *pDocMgr);
 
+    void _UpdateLanguageBarOnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus);
+
     BOOL _InitKeyEventSink();
     void _UninitKeyEventSink();
+
+    BOOL _InitActiveLanguageProfileNotifySink();
+    void _UninitActiveLanguageProfileNotifySink();
 
     BOOL _IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT *pCodeOut, _Out_writes_(1) WCHAR *pwch, _Out_opt_ _KEYSTROKE_STATE *pKeyState);
 
@@ -155,6 +183,12 @@ private:
     VOID _DeleteCandidateList(BOOL fForce, _In_opt_ ITfContext *pContext);
 
     WCHAR ConvertVKey(UINT code);
+
+    BOOL _InitThreadFocusSink();
+    void _UninitThreadFocusSink();
+
+    BOOL _InitFunctionProviderSink();
+    void _UninitFunctionProviderSink();
 
     BOOL _AddTextProcessorEngine();
 
@@ -173,8 +207,17 @@ private:
     ITfContext* _pTextEditSinkContext;
     DWORD _textEditSinkCookie;
 
+    // The cookie of ActiveLanguageProfileNotifySink
+    DWORD _activeLanguageProfileNotifySinkCookie;
+
+    // The cookie of ThreadFocusSink
+    DWORD _dwThreadFocusSinkCookie;
+
     // Composition Processor Engine object.
     CCompositionProcessorEngine* _pCompositionProcessorEngine;
+
+    // Language bar item object.
+    CLangBarItemButton* _pLangBarItem;
 
     // the current composition object.
     ITfComposition* _pComposition;
@@ -198,4 +241,7 @@ private:
     HWND _msgWndHandle; 
 
     LONG _refCount;
+
+    // Support the search integration
+    ITfFnSearchCandidateProvider* _pITfFnSearchCandidateProvider;
 };
