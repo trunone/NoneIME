@@ -358,6 +358,28 @@ HRESULT CNoneIME::_HandleCompositionFinalize(TfEditCookie ec, _In_ ITfContext *p
 
 HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pContext, BOOL isWildcardSearch)
 {
+    if (_pCompositionProcessorEngine && _pCompositionProcessorEngine->GetVirtualKeyLength() == 2 &&
+        _pCompositionProcessorEngine->GetVirtualKey(0) == L',' && _pCompositionProcessorEngine->GetVirtualKey(1) == L',')
+    {
+        CCompartment CompartmentKeyboardOpen(_pThreadMgr, _tfClientId, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE);
+        CompartmentKeyboardOpen._SetCompartmentBOOL(FALSE);
+        return _HandleCancel(ec, pContext);
+    }
+
+    if (_pCompositionProcessorEngine && _pCompositionProcessorEngine->GetVirtualKeyLength() > 2 &&
+        _pCompositionProcessorEngine->GetVirtualKey(0) == L',' && _pCompositionProcessorEngine->GetVirtualKey(1) == L',')
+    {
+        CNoneImeArray<CCandidateListItem> candidateList;
+        _pCompositionProcessorEngine->GetCandidateList(&candidateList, FALSE, FALSE);
+        if (candidateList.Count() > 0)
+        {
+            CCandidateListItem* pItem = candidateList.GetAt(0);
+            HRESULT hr = _AddCharAndFinalize(ec, pContext, &pItem->_ItemString);
+            _HandleCancel(ec, pContext);
+            return hr;
+        }
+    }
+
     HRESULT hr = S_OK;
 
     CNoneImeArray<CCandidateListItem> candidateList;

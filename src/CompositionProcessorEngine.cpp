@@ -223,9 +223,15 @@ BOOL CCompositionProcessorEngine::AddVirtualKey(WCHAR wch)
         return FALSE;
     }
 
-    // Boshiamy composition accepts at most five keystrokes/root characters.
-    // Reject any extra input instead of growing the composition buffer.
-    if (_keystrokeBuffer.GetLength() >= 5)
+    // Boshiamy composition accepts at most five keystrokes/root characters,
+    // except when typing in English mode prefix (,,) which allows longer input.
+    DWORD_PTR maxLen = 5;
+    if (_keystrokeBuffer.GetLength() >= 1 && _keystrokeBuffer.Get()[0] == L',')
+    {
+        maxLen = 256;
+    }
+
+    if (_keystrokeBuffer.GetLength() >= maxLen)
     {
         return FALSE;
     }
@@ -366,6 +372,25 @@ void CCompositionProcessorEngine::GetCandidateList(_Inout_ CNoneImeArray<CCandid
         if (!isIncrementalWordSearch)
         {
             _pTableDictionaryEngine->CollectHomophones(&homophoneKeyCode, pCandidateList);
+        }
+        return;
+    }
+
+    if (_keystrokeBuffer.GetLength() >= 2 && _keystrokeBuffer.Get()[0] == L',' && _keystrokeBuffer.Get()[1] == L',')
+    {
+        CCandidateListItem* pLI = pCandidateList->Append();
+        if (pLI)
+        {
+            if (_keystrokeBuffer.GetLength() == 2)
+            {
+                pLI->_ItemString.Set(L"英文模式", 4);
+            }
+            else
+            {
+                pLI->_ItemString.Set(_keystrokeBuffer.Get() + 2, _keystrokeBuffer.GetLength() - 2);
+            }
+            pLI->_FindKeyCode.Set(_keystrokeBuffer.Get(), _keystrokeBuffer.GetLength());
+            pLI->_ShowFindKeyCode = FALSE;
         }
         return;
     }
@@ -1237,6 +1262,37 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCH
             }
         }
         return TRUE;
+    }
+
+    if (_keystrokeBuffer.GetLength() >= 2 && _keystrokeBuffer.Get()[0] == L',' && _keystrokeBuffer.Get()[1] == L',')
+    {
+        if (uCode == VK_SPACE)
+        {
+            if (pKeyState)
+            {
+                if (candidateMode == CANDIDATE_INCREMENTAL || candidateMode == CANDIDATE_ORIGINAL)
+                {
+                    pKeyState->Category = CATEGORY_CANDIDATE;
+                    pKeyState->Function = FUNCTION_CONVERT;
+                }
+                else
+                {
+                    pKeyState->Category = CATEGORY_COMPOSING;
+                    pKeyState->Function = FUNCTION_CONVERT;
+                }
+            }
+            return TRUE;
+        }
+
+        if (pwch && *pwch >= 32)
+        {
+            if (pKeyState)
+            {
+                pKeyState->Category = CATEGORY_COMPOSING;
+                pKeyState->Function = FUNCTION_INPUT;
+            }
+            return TRUE;
+        }
     }
 
     if (pKeyState)

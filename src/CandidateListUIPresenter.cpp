@@ -51,6 +51,14 @@ HRESULT CNoneIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *pCo
 
     if (candidateLen)
     {
+        if (_pCompositionProcessorEngine && _pCompositionProcessorEngine->GetVirtualKeyLength() == 2 &&
+            _pCompositionProcessorEngine->GetVirtualKey(0) == L',' && _pCompositionProcessorEngine->GetVirtualKey(1) == L',')
+        {
+            CCompartment CompartmentKeyboardOpen(_pThreadMgr, _tfClientId, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE);
+            CompartmentKeyboardOpen._SetCompartmentBOOL(FALSE);
+            return _HandleCancel(ec, pContext);
+        }
+
         hr = _AddComposingAndChar(ec, pContext, &candidateString);
 
         if (FAILED(hr))
