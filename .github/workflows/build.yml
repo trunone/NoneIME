@@ -1,4 +1,4 @@
-name: Build Win64 Debug
+name: Build NoneIME
 
 on:
   push:
@@ -10,18 +10,22 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+        platform: [x64, Win32]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build Win64 Debug
+      - name: Build NoneIME (${{ matrix.platform }} - ${{ matrix.configuration }})
         shell: powershell
         run: |
-          .\build.ps1 -Configuration Debug -Platform x64
+          .\build.ps1 -Configuration ${{ matrix.configuration }} -Platform ${{ matrix.platform }}
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: NoneIME-Win64-Debug
-          path: bin/x64/Debug/
+          name: NoneIME-${{ matrix.platform }}-${{ matrix.configuration }}
+          path: bin/${{ matrix.platform }}/${{ matrix.configuration }}/
