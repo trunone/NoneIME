@@ -843,7 +843,7 @@ void CCandidateListUIPresenter::_SetText(_In_ CNoneImeArray<CCandidateListItem> 
     AddCandidateToCandidateListUI(pCandidateList, isAddFindKeyCode);
     _pCandidateWnd->_ResizeToFitCandidates();
 
-    SetPageIndexWithScrollInfo(pCandidateList);
+    SetPageIndex(pCandidateList);
 
     if (_isShowMode)
     {
@@ -868,7 +868,7 @@ void CCandidateListUIPresenter::AddCandidateToCandidateListUI(_In_ CNoneImeArray
     }
 }
 
-void CCandidateListUIPresenter::SetPageIndexWithScrollInfo(_In_ CNoneImeArray<CCandidateListItem> *pCandidateList)
+void CCandidateListUIPresenter::SetPageIndex(_In_ CNoneImeArray<CCandidateListItem> *pCandidateList)
 {
     UINT candCntInPage = _pIndexRange->Count();
     UINT bufferSize = pCandidateList->Count() / candCntInPage + 1;
@@ -883,8 +883,6 @@ void CCandidateListUIPresenter::SetPageIndexWithScrollInfo(_In_ CNoneImeArray<CC
         _pCandidateWnd->_SetPageIndex(puPageIndex, bufferSize);
         delete [] puPageIndex;
     }
-    _pCandidateWnd->_SetScrollInfo(pCandidateList->Count(), candCntInPage);  // nMax:range of max, nPage:number of items in page
-
 }
 //+---------------------------------------------------------------------------
 //
@@ -1298,7 +1296,7 @@ HRESULT CCandidateListUIPresenter::MakeCandidateWindow(_In_ ITfContext *pContext
         return hr;
     }
 
-    _pCandidateWnd = new (std::nothrow) CCandidateWindow(_CandWndCallback, this, _pIndexRange, _pTextService->_IsStoreAppMode());
+    _pCandidateWnd = new (std::nothrow) CCandidateWindow(_CandWndCallback, this, _pIndexRange);
     if (_pCandidateWnd == nullptr)
     {
         hr = E_OUTOFMEMORY;

@@ -100,8 +100,6 @@ inline BOOL IsTooSimilar(COLORREF cr1, COLORREF cr2)
 extern HINSTANCE dllInstanceHandle;
 
 extern ATOM AtomCandidateWindow;
-extern ATOM AtomShadowWindow;
-extern ATOM AtomScrollBarWindow;
 
 BOOL RegisterWindowClass();
 
@@ -127,8 +125,6 @@ extern BOOL IsShiftKeyDownOnly;
 extern BOOL IsControlKeyDownOnly;
 extern BOOL IsAltKeyDownOnly;
 
-extern const GUID NoneIMEGuidLangBarIMEMode;
-
 extern const GUID NoneIMEGuidDisplayAttributeInput;
 extern const GUID NoneIMEGuidDisplayAttributeConverted;
 
@@ -141,6 +137,4 @@ extern const WCHAR StringDelimiter;
 extern const WCHAR ImeModeDescription[];
 extern const int ImeModeOnIcoIndex;
 extern const int ImeModeOffIcoIndex;
-
-extern const WCHAR LangbarImeModeDescription[];
 }
