@@ -134,5 +134,11 @@ extern const WCHAR UnicodeByteOrderMark;
 extern const WCHAR KeywordDelimiter;
 extern const WCHAR StringDelimiter;
 
+extern const GUID NoneIMEGuidLangBarIMEMode;
+
 extern const WCHAR ImeModeDescription[];
+extern const int ImeModeOnIcoIndex;
+extern const int ImeModeOffIcoIndex;
+
+extern const WCHAR LangbarImeModeDescription[];
 }

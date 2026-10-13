@@ -146,6 +146,18 @@ extern const GUID NoneIMEGuidImeModePreserveKey = {
     { 0x90, 0x95, 0xa9, 0x6d, 0xf9, 0xcb, 0xdf, 0x38 } 
 };
 
+//---------------------------------------------------------------------
+// LanguageBars
+//---------------------------------------------------------------------
+
+// {89BE500C-9462-4070-9DB0-B467BB051327}
+extern const GUID NoneIMEGuidLangBarIMEMode = {
+    0x89be500c,
+    0x9462,
+    0x4070,
+    { 0x9d, 0xb0, 0xb4, 0x67, 0xbb, 0x5, 0x13, 0x27 }
+};
+
 // {4C802E2C-8140-4436-A5E5-F7C544EBC9CD}
 extern const GUID NoneIMEGuidDisplayAttributeInput = {
     0x4c802e2c,
@@ -190,6 +202,13 @@ extern const WCHAR StringDelimiter  = L'\"';
 // defined item in setting file table [PreservedKey] section
 //---------------------------------------------------------------------
 extern const WCHAR ImeModeDescription[] = L"Chinese/English input (Shift)";
+extern const int ImeModeOnIcoIndex = IME_MODE_ON_ICON_INDEX;
+extern const int ImeModeOffIcoIndex = IME_MODE_OFF_ICON_INDEX;
+
+//---------------------------------------------------------------------
+// defined item in setting file table [LanguageBar] section
+//---------------------------------------------------------------------
+extern const WCHAR LangbarImeModeDescription[] = L"Conversion mode";
 
 //---------------------------------------------------------------------
 // windows class / titile / atom

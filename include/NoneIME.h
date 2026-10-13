@@ -154,6 +154,8 @@ private:
 
     BOOL _InitTextEditSink(_In_ ITfDocumentMgr *pDocMgr);
 
+    void _UpdateLanguageBarOnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus);
+
     BOOL _InitKeyEventSink();
     void _UninitKeyEventSink();
 
