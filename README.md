@@ -6,9 +6,20 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 
 ## 功能
 
-- 依嘸蝦米字根查字、選字
-- 單字候選提供國語同音字；輸入碼前加單引號可查同音字
-- 支援 TSF 組字、候選字視窗、語言列及輸入模式切換
+- **字根輸入與組字**：
+  - 支援英文字母 (A–Z) 及標點字根（`,`、`.`、`'`、`[`、`]`、`;`）進行拆碼組字。
+  - 組字區最多接受 5 個字根碼，達到 5 碼後將忽略多餘輸入。
+  - 支援萬用字元查詢：可在拆碼中輸入 `?`（代表單一字元）或 `*`（代表任意字元序列）進行模糊檢索。
+  - 無效拆碼提示：若輸入無對應候選字的無效字碼組合，候選視窗會以紅字顯示輸入碼以提醒使用者。
+- **同音字查詢**：
+  - 在輸入碼前加單引號 `'`（例如 `'a`），即可檢索該讀音對應的國語同音字清單（須搭配 `Boshiamy-Homophones.bin` 字典檔）。
+- **候選字視窗與選字操作**：
+  - 支援數字鍵 1–9 與 0（代表第 10 項）進行快速數字選字。
+  - 可透過 Space（空白鍵）、PageUp / PageDown 或方向鍵進行候選字翻頁與選取。
+  - 候選字視窗會依候選內容長度自動調整寬度。
+- **模式切換與 TSF 整合**：
+  - 支援單按 Shift 鍵切換中文/英文輸入模式。
+  - 整合 Windows 語言列（Language Bar）按鈕及 TSF 狀態切換。
 
 ## 建置
 
@@ -32,13 +43,15 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 ./install.ps1
 ```
 
-可用 `-Configuration Release -Platform x64` 或 `-Platform Win32` 指定其他版本；若要註冊其他位置的 DLL，請使用 `-DllPath`，並將 `Boshiamy.cin` 放在 DLL 同一目錄。同音字字典為選用檔案。移除時請使用對應的參數：
+可用 `-Configuration Release -Platform x64` 或 `-Platform Win32` 指定其他版本；若要註冊其他位置的 DLL，請使用 `-DllPath`，並將 `Boshiamy.cin` 放在 DLL 同一目錄。同音字字典（`Boshiamy-Homophones.bin`）為選用檔案。安裝與移除腳本（`install.ps1` / `uninstall.ps1`）會自動檢查管理員權限並於需要時要求 UAC 權限提升。
+
+移除時請使用對應的參數：
 
 ```powershell
 ./uninstall.ps1
 ```
 
-腳本只註冊或取消註冊 TSF/COM 元件，不會複製或刪除建置檔案。若 Windows 拒絕註冊，請以系統管理員身分執行 PowerShell。安裝後，請到 Windows 的語言與鍵盤設定啟用 None IME。
+腳本只註冊或取消註冊 TSF/COM 元件，不會複製或刪除建置檔案。若 Windows 拒絕註冊，也可手動以系統管理員身分執行 PowerShell。安裝後，請到 Windows 的語言與鍵盤設定啟用 None IME。
 
 ## 字典資料
 
@@ -64,4 +77,3 @@ powershell -ExecutionPolicy Bypass -File Dictionary/build_boshiamy_homophones.ps
 本專案由作者持有著作權且有權授權的原創部分採 MIT License；第三方程式碼、字典及資料不包含在此授權範圍內。目前儲存庫未附 MIT 授權全文，正式以 MIT 發行時應一併附上授權本文及權利人資訊，並確認只涵蓋有權授權的內容。
 
 TSF 實作改編自 [Microsoft Windows-classic-samples](https://github.com/microsoft/Windows-classic-samples) 的範例；該專案採 MIT License。本專案保留範例程式碼中的 Microsoft 著作權與免責聲明，散布改編部分時亦須保留 MIT 授權要求的著作權及許可聲明。嘸蝦米字表來自 [jdh8/ibus-boshiamy](https://github.com/jdh8/ibus-boshiamy)：上游 README 宣告 GPLv3-or-later（GPLv3+），字表不屬於 MIT 授權，重新散布時須遵守上游授權及保留相關聲明；同音字資料使用外部來源資料，亦須遵守各資料來源的條款。
-
