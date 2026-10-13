@@ -13,7 +13,7 @@
 class CTableDictionaryEngine : public CBaseDictionaryEngine
 {
 public:
-    CTableDictionaryEngine(LCID locale, _In_ CFile *pDictionaryFile, _In_opt_ CFileMapping *pHomophoneDictionaryFile = nullptr) : CBaseDictionaryEngine(locale, pDictionaryFile), _pHomophoneDictionaryFile(pHomophoneDictionaryFile) { }
+    CTableDictionaryEngine(LCID locale, _In_ CFile *pDictionaryFile) : CBaseDictionaryEngine(locale, pDictionaryFile) { }
     virtual ~CTableDictionaryEngine() { }
 
     // Collect word from phrase string.
@@ -24,14 +24,8 @@ public:
     //     none.
     VOID CollectWord(_In_ CStringRange *pKeyCode, _Inout_ CNoneImeArray<CStringRange> *pWordStrings);
     VOID CollectWord(_In_ CStringRange *pKeyCode, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
-    VOID CollectHomophones(_In_ CStringRange *pKeyCode, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
 
     VOID CollectWordForWildcard(_In_ CStringRange *psrgKeyCode, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
 
     VOID CollectWordFromConvertedStringForWildcard(_In_ CStringRange *pString, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
-
-private:
-    VOID CollectHomophonesFromList(_In_ CStringRange *pHomophones, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
-
-    CFileMapping* _pHomophoneDictionaryFile;
 };

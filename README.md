@@ -7,7 +7,6 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 ## 功能
 
 - 依嘸蝦米字根查字、選字
-- 單字候選提供國語同音字；輸入碼前加單引號可查同音字
 - 支援 TSF 組字、候選字視窗、語言列及輸入模式切換
 
 ## 建置
@@ -32,7 +31,7 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 ./install.ps1
 ```
 
-可用 `-Configuration Release -Platform x64` 或 `-Platform Win32` 指定其他版本；若要註冊其他位置的 DLL，請使用 `-DllPath`，並將 `Boshiamy.cin` 放在 DLL 同一目錄。同音字字典為選用檔案。移除時請使用對應的參數：
+可用 `-Configuration Release -Platform x64` 或 `-Platform Win32` 指定其他版本；若要註冊其他位置的 DLL，請使用 `-DllPath`，並將 `Boshiamy.cin` 放在 DLL 同一目錄。移除時請使用對應的參數：
 
 ```powershell
 ./uninstall.ps1
@@ -49,19 +48,11 @@ Copy-Item C:\data\boshiamy.cin Dictionary\Boshiamy.cin
 ./build.ps1 -Configuration Release -Platform x64
 ```
 
-若要自行重建同音字資料，請先將 `Boshiamy.cin` 放入 `Dictionary`，再從教育部「辭典公眾授權網」下載《重編國語辭典修訂本》資料 ZIP，解壓後使用 `dict_revised_2015_*.xlsx`。產生器直接讀取 CIN 表格，依教育部資料中的注音建立字元到讀音及讀音到同音字清單的二層索引，只保留同時存在於嘸蝦米碼表及教育部資料中的字，並產生 `Boshiamy-Homophones.bin`：
-
-```powershell
-$moeDictionaryWorkbookPath = 'C:\data\dict_revised_2015_20260929.xlsx'
-powershell -ExecutionPolicy Bypass -File Dictionary/build_boshiamy_homophones.ps1 `
-	-MoeDictionaryWorkbookPath $moeDictionaryWorkbookPath
-```
-
 目前版本未附獨立的字表授權說明文件；字表授權標示及注意事項見下方「授權」。
 
 ## 授權
 
 本專案由作者持有著作權且有權授權的原創部分採 MIT License；第三方程式碼、字典及資料不包含在此授權範圍內。目前儲存庫未附 MIT 授權全文，正式以 MIT 發行時應一併附上授權本文及權利人資訊，並確認只涵蓋有權授權的內容。
 
-TSF 實作改編自 [Microsoft Windows-classic-samples](https://github.com/microsoft/Windows-classic-samples) 的範例；該專案採 MIT License。本專案保留範例程式碼中的 Microsoft 著作權與免責聲明，散布改編部分時亦須保留 MIT 授權要求的著作權及許可聲明。嘸蝦米字表來自 [jdh8/ibus-boshiamy](https://github.com/jdh8/ibus-boshiamy)：上游 README 宣告 GPLv3-or-later（GPLv3+），字表不屬於 MIT 授權，重新散布時須遵守上游授權及保留相關聲明；同音字資料使用外部來源資料，亦須遵守各資料來源的條款。
+TSF 實作改編自 [Microsoft Windows-classic-samples](https://github.com/microsoft/Windows-classic-samples) 的範例；該專案採 MIT License。本專案保留範例程式碼中的 Microsoft 著作權與免責聲明，散布改編部分時亦須保留 MIT 授權要求的著作權及許可聲明。嘸蝦米字表來自 [jdh8/ibus-boshiamy](https://github.com/jdh8/ibus-boshiamy)：上游 README 宣告 GPLv3-or-later（GPLv3+），字表不屬於 MIT 授權，重新散布時須遵守上游授權及保留相關聲明。
 

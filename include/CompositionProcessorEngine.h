@@ -123,7 +123,6 @@ private:
     _KEYSTROKE _keystrokeTable[32];
 
     CTableDictionaryEngine* _pTableDictionaryEngine;
-    CFileMapping* _pHomophoneDictionaryFile;
     CStringRange _keystrokeBuffer;
 
     BOOL _hasWildcardIncludedInKeystrokeBuffer;

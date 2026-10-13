@@ -100,7 +100,6 @@ CCompositionProcessorEngine::CCompositionProcessorEngine()
 {
     _pTableDictionaryEngine = nullptr;
     _pDictionaryFile = nullptr;
-    _pHomophoneDictionaryFile = nullptr;
 
     _langid = 0xffff;
     _guidProfile = GUID_NULL;
@@ -167,11 +166,6 @@ CCompositionProcessorEngine::~CCompositionProcessorEngine()
     {
         delete _pDictionaryFile;
         _pDictionaryFile = nullptr;
-    }
-    if (_pHomophoneDictionaryFile)
-    {
-        delete _pHomophoneDictionaryFile;
-        _pHomophoneDictionaryFile = nullptr;
     }
 }
 
@@ -366,17 +360,6 @@ void CCompositionProcessorEngine::GetCandidateList(_Inout_ CNoneImeArray<CCandid
 {
     if (!IsDictionaryAvailable())
     {
-        return;
-    }
-
-    if (_keystrokeBuffer.GetLength() > 1 && _keystrokeBuffer.Get()[0] == L'\'')
-    {
-        CStringRange homophoneKeyCode;
-        homophoneKeyCode.Set(_keystrokeBuffer.Get() + 1, _keystrokeBuffer.GetLength() - 1);
-        if (!isIncrementalWordSearch)
-        {
-            _pTableDictionaryEngine->CollectHomophones(&homophoneKeyCode, pCandidateList);
-        }
         return;
     }
 
@@ -824,19 +807,7 @@ BOOL CCompositionProcessorEngine::SetupDictionaryFile()
         return FALSE;
     }
 
-    WCHAR homophoneFileName[MAX_PATH] = { L'\0' };
-    if (SUCCEEDED(StringCchCopyW(homophoneFileName, ARRAYSIZE(homophoneFileName), wszFileName)) &&
-        SUCCEEDED(StringCchCatW(homophoneFileName, ARRAYSIZE(homophoneFileName), TEXTSERVICE_HOMOPHONE_DIC)))
-    {
-        _pHomophoneDictionaryFile = new (std::nothrow) CFileMapping();
-        if (_pHomophoneDictionaryFile &&
-            !_pHomophoneDictionaryFile->CreateFile(homophoneFileName, GENERIC_READ, OPEN_EXISTING, FILE_SHARE_READ))
-        {
-            delete _pHomophoneDictionaryFile;
-            _pHomophoneDictionaryFile = nullptr;
-        }
-    }
-    _pTableDictionaryEngine = new (std::nothrow) CTableDictionaryEngine(GetLocale(), _pDictionaryFile, _pHomophoneDictionaryFile);
+    _pTableDictionaryEngine = new (std::nothrow) CTableDictionaryEngine(GetLocale(), _pDictionaryFile);
     if (!_pTableDictionaryEngine)
     {
         return FALSE;
@@ -1291,26 +1262,6 @@ void CCompositionProcessorEngine::SetDefaultCandidateTextFont()
 
 BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCHAR *pwch, BOOL fComposing, CANDIDATE_MODE candidateMode, BOOL hasCandidateWithWildcard, _Out_opt_ _KEYSTROKE_STATE *pKeyState)
 {
-    if (uCode == VK_SPACE &&
-        (candidateMode == CANDIDATE_ORIGINAL || candidateMode == CANDIDATE_INCREMENTAL) &&
-        _keystrokeBuffer.GetLength() > 1 && _keystrokeBuffer.Get()[0] == L'\'')
-    {
-        if (pKeyState)
-        {
-            if (candidateMode == CANDIDATE_ORIGINAL)
-            {
-                pKeyState->Category = CATEGORY_CANDIDATE;
-                pKeyState->Function = FUNCTION_MOVE_PAGE_DOWN_CYCLE;
-            }
-            else
-            {
-                pKeyState->Category = CATEGORY_COMPOSING;
-                pKeyState->Function = FUNCTION_CONVERT;
-            }
-        }
-        return TRUE;
-    }
-
     if (pKeyState)
     {
         pKeyState->Category = CATEGORY_NONE;
