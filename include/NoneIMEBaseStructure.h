@@ -49,7 +49,6 @@ enum KEYSTROKE_FUNCTION
     FUNCTION_FINALIZE_CANDIDATELIST,
     FUNCTION_FINALIZE_CANDIDATELIST_AND_INPUT,
     FUNCTION_CONVERT,
-    FUNCTION_CONVERT_WILDCARD,
     FUNCTION_SELECT_BY_NUMBER,
     FUNCTION_BACKSPACE,
     FUNCTION_MOVE_LEFT,
@@ -208,7 +207,6 @@ public:
     CStringRange& operator=(const CStringRange& sr);
     void CharNext(_Inout_ CStringRange* pCharNext);
     static int Compare(LCID locale, _In_ CStringRange* pString1, _In_ CStringRange* pString2);
-    static BOOL WildcardCompare(LCID locale, _In_ CStringRange* stringWithWildcard, _In_ CStringRange* targetString);
 
 protected:
     DWORD_PTR _stringBufLen;         // Length is in character count.

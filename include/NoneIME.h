@@ -107,7 +107,7 @@ public:
     // key event handlers for composition object.
     HRESULT _HandleCompositionInput(TfEditCookie ec, _In_ ITfContext *pContext, WCHAR wch);
     HRESULT _HandleCompositionFinalize(TfEditCookie ec, _In_ ITfContext *pContext, BOOL fCandidateList);
-    HRESULT _HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pContext, BOOL isWildcardSearch);
+    HRESULT _HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pContext);
     HRESULT _HandleCompositionBackspace(TfEditCookie ec, _In_ ITfContext *pContext);
     HRESULT _HandleCompositionArrowKey(TfEditCookie ec, _In_ ITfContext *pContext, KEYSTROKE_FUNCTION keyFunction);
 
@@ -228,7 +228,6 @@ private:
 
     CANDIDATE_MODE _candidateMode;
     CCandidateListUIPresenter *_pCandidateListUIPresenter;
-    BOOL _isCandidateWithWildcard;
     BOOL _isErrorCandidate;
 
     ITfDocumentMgr* _pDocMgrLastFocused;

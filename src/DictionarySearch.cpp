@@ -40,29 +40,7 @@ CDictionarySearch::~CDictionarySearch()
 
 BOOL CDictionarySearch::FindPhrase(_Out_ CDictionaryResult **ppdret)
 {
-    return FindWorker(FALSE, ppdret, FALSE); // NO WILDCARD
-}
-
-//+---------------------------------------------------------------------------
-//
-// FindPhraseForWildcard
-//
-//----------------------------------------------------------------------------
-
-BOOL CDictionarySearch::FindPhraseForWildcard(_Out_ CDictionaryResult **ppdret)
-{
-    return FindWorker(FALSE, ppdret, TRUE); // Wildcard
-}
-
-//+---------------------------------------------------------------------------
-//
-// FindConvertedStringForWildcard
-//
-//----------------------------------------------------------------------------
-
-BOOL CDictionarySearch::FindConvertedStringForWildcard(CDictionaryResult **ppdret)
-{
-    return FindWorker(TRUE, ppdret, TRUE); // Wildcard
+    return FindWorker(FALSE, ppdret);
 }
 
 //+---------------------------------------------------------------------------
@@ -71,7 +49,7 @@ BOOL CDictionarySearch::FindConvertedStringForWildcard(CDictionaryResult **ppdre
 //
 //----------------------------------------------------------------------------
 
-BOOL CDictionarySearch::FindWorker(BOOL isTextSearch, _Out_ CDictionaryResult **ppdret, BOOL isWildcardSearch)
+BOOL CDictionarySearch::FindWorker(BOOL isTextSearch, _Out_ CDictionaryResult **ppdret)
 {
     DWORD_PTR dwTotalBufLen = GetBufferInWCharLength();        // in char
     if (dwTotalBufLen == 0)
@@ -105,28 +83,13 @@ TryAgain:
         if (!isTextSearch)
         {
             // Compare Dictionary key code and input key code
-            if (!isWildcardSearch)
+            if (CStringRange::Compare(_locale, &keyword, _pSearchKeyCode) != CSTR_EQUAL)
             {
-                if (CStringRange::Compare(_locale, &keyword, _pSearchKeyCode) != CSTR_EQUAL)
+                if (bufLen)
                 {
-                    if (bufLen)
-                    {
-                        delete [] pText;
-                    }
-                    goto FindNextLine;
+                    delete [] pText;
                 }
-            }
-            else
-            {
-                // Wildcard search
-                if (!CStringRange::WildcardCompare(_locale, _pSearchKeyCode, &keyword))
-                {
-                    if (bufLen)
-                    {
-                        delete [] pText;
-                    }
-                    goto FindNextLine;
-                }
+                goto FindNextLine;
             }
         }
         else
@@ -145,28 +108,13 @@ TryAgain:
             {
                 CStringRange* pTempString = convertedStrings.GetAt(0);
 
-                if (!isWildcardSearch)
+                if (CStringRange::Compare(_locale, pTempString, _pSearchKeyCode) != CSTR_EQUAL)
                 {
-                    if (CStringRange::Compare(_locale, pTempString, _pSearchKeyCode) != CSTR_EQUAL)
+                    if (bufLen)
                     {
-                        if (bufLen)
-                        {
-                            delete [] pText;
-                        }
-                        goto FindNextLine;
+                        delete [] pText;
                     }
-                }
-                else
-                {
-                    // Wildcard search
-                    if (!CStringRange::WildcardCompare(_locale, _pSearchKeyCode, pTempString))
-                    {
-                        if (bufLen)
-                        {
-                            delete [] pText;
-                        }
-                        goto FindNextLine;
-                    }
+                    goto FindNextLine;
                 }
             }
             else

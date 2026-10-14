@@ -27,16 +27,13 @@ public:
     virtual ~CDictionarySearch();
 
     BOOL FindPhrase(_Out_ CDictionaryResult **ppdret);
-    BOOL FindPhraseForWildcard(_Out_ CDictionaryResult **ppdret);
-
-    BOOL FindConvertedStringForWildcard(CDictionaryResult **ppdret);
 
     CStringRange* _pSearchKeyCode;
 
     DWORD_PTR _charIndex;      // in character. Always point start of line in dictionary file.
 
 private:
-    BOOL FindWorker(BOOL isTextSearch, _Out_ CDictionaryResult **ppdret, BOOL isWildcardSearch);
+    BOOL FindWorker(BOOL isTextSearch, _Out_ CDictionaryResult **ppdret);
 
     DWORD_PTR GetBufferInWCharLength()
     {

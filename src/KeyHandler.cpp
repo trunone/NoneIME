@@ -64,7 +64,6 @@ VOID CNoneIME::_DeleteCandidateList(BOOL isForce, _In_opt_ ITfContext *pContext)
         _pCandidateListUIPresenter->_EndCandidateList();
 
         _candidateMode = CANDIDATE_NONE;
-        _isCandidateWithWildcard = FALSE;
     }
     _isErrorCandidate = FALSE;
 }
@@ -172,12 +171,11 @@ HRESULT CNoneIME::_HandleCompositionInputWorker(_In_ CCompositionProcessorEngine
 {
     HRESULT hr = S_OK;
     CNoneImeArray<CStringRange> readingStrings;
-    BOOL isWildcardIncluded = TRUE;
 
     //
     // Get reading string from composition processor engine
     //
-    pCompositionProcessorEngine->GetReadingStrings(&readingStrings, &isWildcardIncluded);
+    pCompositionProcessorEngine->GetReadingStrings(&readingStrings);
 
     for (UINT index = 0; index < readingStrings.Count(); index++)
     {
@@ -207,7 +205,7 @@ HRESULT CNoneIME::_HandleCompositionInputWorker(_In_ CCompositionProcessorEngine
     //
     CNoneImeArray<CCandidateListItem> candidateList;
 
-    pCompositionProcessorEngine->GetCandidateList(&candidateList, TRUE, FALSE);
+    pCompositionProcessorEngine->GetCandidateList(&candidateList, TRUE);
 
     if ((candidateList.Count()))
     {
@@ -221,14 +219,6 @@ HRESULT CNoneIME::_HandleCompositionInputWorker(_In_ CCompositionProcessorEngine
     else if (_pCandidateListUIPresenter)
     {
         _pCandidateListUIPresenter->_ClearList();
-    }
-    else if (readingStrings.Count() && isWildcardIncluded)
-    {
-        hr = _CreateAndStartCandidate(pCompositionProcessorEngine, ec, pContext);
-        if (SUCCEEDED(hr))
-        {
-            _pCandidateListUIPresenter->_ClearList();
-        }
     }
     return hr;
 }
@@ -251,7 +241,6 @@ HRESULT CNoneIME::_CreateAndStartCandidate(_In_ CCompositionProcessorEngine *pCo
         _pCandidateListUIPresenter = nullptr;
 
         _candidateMode = CANDIDATE_NONE;
-        _isCandidateWithWildcard = FALSE;
     }
 
     if (_pCandidateListUIPresenter == nullptr)
@@ -266,7 +255,6 @@ HRESULT CNoneIME::_CreateAndStartCandidate(_In_ CCompositionProcessorEngine *pCo
         }
 
         _candidateMode = CANDIDATE_INCREMENTAL;
-        _isCandidateWithWildcard = FALSE;
 
         // we don't cache the document manager object. So get it from pContext.
         ITfDocumentMgr* pDocumentMgr = nullptr;
@@ -356,7 +344,7 @@ HRESULT CNoneIME::_HandleCompositionFinalize(TfEditCookie ec, _In_ ITfContext *p
 //
 //----------------------------------------------------------------------------
 
-HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pContext, BOOL isWildcardSearch)
+HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pContext)
 {
     HRESULT hr = S_OK;
 
@@ -367,7 +355,7 @@ HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pC
     //
     CCompositionProcessorEngine* pCompositionProcessorEngine = nullptr;
     pCompositionProcessorEngine = _pCompositionProcessorEngine;
-    pCompositionProcessorEngine->GetCandidateList(&candidateList, FALSE, isWildcardSearch);
+    pCompositionProcessorEngine->GetCandidateList(&candidateList, FALSE);
 
     // If there is no candlidate listin the current reading string, we don't do anything. Just wait for
     // next char to be ready for the conversion with it.
@@ -381,7 +369,6 @@ HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pC
             _pCandidateListUIPresenter = nullptr;
 
             _candidateMode = CANDIDATE_NONE;
-            _isCandidateWithWildcard = FALSE;
         }
 
         // 
@@ -401,8 +388,6 @@ HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pC
             _candidateMode = CANDIDATE_ORIGINAL;
         }
 
-        _isCandidateWithWildcard = isWildcardSearch;
-
         // we don't cache the document manager object. So get it from pContext.
         ITfDocumentMgr* pDocumentMgr = nullptr;
         if (SUCCEEDED(pContext->GetDocumentMgr(&pDocumentMgr)))
@@ -421,12 +406,11 @@ HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pC
             _pCandidateListUIPresenter->_SetText(&candidateList, FALSE);
         }
     }
-    else if (pCompositionProcessorEngine->IsDictionaryAvailable() && !isWildcardSearch && pCompositionProcessorEngine->GetVirtualKeyLength())
+    else if (pCompositionProcessorEngine->IsDictionaryAvailable() && pCompositionProcessorEngine->GetVirtualKeyLength())
     {
         CNoneImeArray<CStringRange> readingStrings;
-        BOOL isWildcardIncluded = FALSE;
-        pCompositionProcessorEngine->GetReadingStrings(&readingStrings, &isWildcardIncluded);
-        if (!isWildcardIncluded && readingStrings.Count())
+        pCompositionProcessorEngine->GetReadingStrings(&readingStrings);
+        if (readingStrings.Count())
         {
             CCandidateListItem* errorCandidate = candidateList.Append();
             if (errorCandidate)
@@ -448,7 +432,6 @@ HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pC
                     delete _pCandidateListUIPresenter;
                     _pCandidateListUIPresenter = nullptr;
                     _candidateMode = CANDIDATE_NONE;
-                    _isCandidateWithWildcard = FALSE;
                 }
 
                 hr = _CreateAndStartCandidate(pCompositionProcessorEngine, ec, pContext);

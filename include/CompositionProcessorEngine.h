@@ -36,7 +36,7 @@ public:
         return MAKELCID(_langid, SORT_DEFAULT);
     }
 
-    BOOL IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCHAR *pwch, BOOL fComposing, CANDIDATE_MODE candidateMode, BOOL hasCandidateWithWildcard, _Out_opt_ _KEYSTROKE_STATE *pKeyState);
+    BOOL IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCHAR *pwch, BOOL fComposing, CANDIDATE_MODE candidateMode, _Out_opt_ _KEYSTROKE_STATE *pKeyState);
 
     BOOL AddVirtualKey(WCHAR wch);
     void RemoveVirtualKey(DWORD_PTR dwIndex);
@@ -45,18 +45,13 @@ public:
     DWORD_PTR GetVirtualKeyLength() { return _keystrokeBuffer.GetLength(); }
     WCHAR GetVirtualKey(DWORD_PTR dwIndex);
 
-    void GetReadingStrings(_Inout_ CNoneImeArray<CStringRange> *pReadingStrings, _Out_ BOOL *pIsWildcardIncluded);
-    void GetCandidateList(_Inout_ CNoneImeArray<CCandidateListItem> *pCandidateList, BOOL isIncrementalWordSearch, BOOL isWildcardSearch);
+    void GetReadingStrings(_Inout_ CNoneImeArray<CStringRange> *pReadingStrings);
+    void GetCandidateList(_Inout_ CNoneImeArray<CCandidateListItem> *pCandidateList, BOOL isIncrementalWordSearch);
     void GetCandidateStringInConverted(CStringRange &searchString, _In_ CNoneImeArray<CCandidateListItem> *pCandidateList);
 
     // Preserved key handler
     void OnPreservedKey(REFGUID rguid, _Out_ BOOL *pIsEaten, _In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId);
 
-    BOOL IsWildcard() { return _isWildcard; }
-    BOOL IsDisableWildcardAtFirst() { return _isDisableWildcardAtFirst; }
-    BOOL IsWildcardChar(WCHAR wch) { return ((IsWildcardOneChar(wch) || IsWildcardAllChar(wch)) ? TRUE : FALSE); }
-    BOOL IsWildcardOneChar(WCHAR wch) { return (wch==L'?' ? TRUE : FALSE); }
-    BOOL IsWildcardAllChar(WCHAR wch) { return (wch==L'*' ? TRUE : FALSE); }
     BOOL IsMakePhraseFromText() { return _hasMakePhraseFromText; }
     BOOL IsKeystrokeSort() { return _isKeystrokeSort; }
 
@@ -125,15 +120,12 @@ private:
     CTableDictionaryEngine* _pTableDictionaryEngine;
     CStringRange _keystrokeBuffer;
 
-    BOOL _hasWildcardIncludedInKeystrokeBuffer;
-
     LANGID _langid;
     GUID _guidProfile;
     TfClientId  _tfClientId;
 
     CNoneImeArray<_KEYSTROKE> _KeystrokeComposition;
     CNoneImeArray<_KEYSTROKE> _KeystrokeCandidate;
-    CNoneImeArray<_KEYSTROKE> _KeystrokeCandidateWildcard;
     CNoneImeArray<_KEYSTROKE> _KeystrokeCandidateSymbol;
     CNoneImeArray<_KEYSTROKE> _KeystrokeSymbol;
 
@@ -162,8 +154,6 @@ private:
     CCompartmentEventSink* _pCompartmentKeyboardOpenEventSink;
 
     // Configuration data
-    BOOL _isWildcard;
-    BOOL _isDisableWildcardAtFirst;
     BOOL _hasMakePhraseFromText;
     BOOL _isKeystrokeSort;
     BOOL _isComLessMode;
