@@ -82,10 +82,10 @@ HRESULT CNoneIME::_HandleCandidateConvert(TfEditCookie ec, _In_ ITfContext *pCon
     if (_candidateMode == CANDIDATE_INCREMENTAL && _pCompositionProcessorEngine->IsDictionaryAvailable())
     {
         CNoneImeArray<CCandidateListItem> exactCandidateList;
-        _pCompositionProcessorEngine->GetCandidateList(&exactCandidateList, FALSE, FALSE);
+        _pCompositionProcessorEngine->GetCandidateList(&exactCandidateList, FALSE);
         if (!exactCandidateList.Count())
         {
-            return _HandleCompositionConvert(ec, pContext, FALSE);
+            return _HandleCompositionConvert(ec, pContext);
         }
     }
 
@@ -187,7 +187,6 @@ HRESULT CNoneIME::_HandleCandidateWorker(TfEditCookie ec, _In_ ITfContext *pCont
             _pCandidateListUIPresenter = nullptr;
 
             _candidateMode = CANDIDATE_NONE;
-            _isCandidateWithWildcard = FALSE;
         }
 
         if (hrReturn == S_OK)
@@ -196,7 +195,6 @@ HRESULT CNoneIME::_HandleCandidateWorker(TfEditCookie ec, _In_ ITfContext *pCont
             _pCandidateListUIPresenter = pTempCandListUIPresenter;
 
             _candidateMode = tempCandMode;
-            _isCandidateWithWildcard = FALSE;
         }
     }
     else

@@ -163,7 +163,7 @@ BOOL CNoneIME::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT *p
         // eat only keys that CKeyHandlerEditSession can handles.
         //
         if (IsBoshiamyKeyCharacter(*pCodeOut, wch) &&
-            pCompositionProcessorEngine->IsVirtualKeyNeed(*pCodeOut, pwch, _IsComposing(), _candidateMode, _isCandidateWithWildcard, pKeyState))
+            pCompositionProcessorEngine->IsVirtualKeyNeed(*pCodeOut, pwch, _IsComposing(), _candidateMode, pKeyState))
         {
             return TRUE;
         }

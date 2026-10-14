@@ -771,12 +771,12 @@ void CCandidateWindow::_AddString(_Inout_ CCandidateListItem *pCandidateItem, _I
         memcpy((void*)pwchString, pCandidateItem->_ItemString.Get(), dwItemString * sizeof(WCHAR));
     }
 
-    DWORD_PTR itemWildcard = pCandidateItem->_FindKeyCode.GetLength();
-    WCHAR* pwchWildcard = nullptr;
-    if (itemWildcard && (isAddFindKeyCode || pCandidateItem->_ShowFindKeyCode))
+    DWORD_PTR itemFindKeyCode = pCandidateItem->_FindKeyCode.GetLength();
+    WCHAR* pwchFindKeyCode = nullptr;
+    if (itemFindKeyCode && (isAddFindKeyCode || pCandidateItem->_ShowFindKeyCode))
     {
-        pwchWildcard = new (std::nothrow) WCHAR[ itemWildcard ];
-        if (!pwchWildcard)
+        pwchFindKeyCode = new (std::nothrow) WCHAR[ itemFindKeyCode ];
+        if (!pwchFindKeyCode)
         {
             if (pwchString)
             {
@@ -784,10 +784,10 @@ void CCandidateWindow::_AddString(_Inout_ CCandidateListItem *pCandidateItem, _I
             }
             return;
         }
-        memcpy((void*)pwchWildcard, pCandidateItem->_FindKeyCode.Get(), itemWildcard * sizeof(WCHAR));
+        memcpy((void*)pwchFindKeyCode, pCandidateItem->_FindKeyCode.Get(), itemFindKeyCode * sizeof(WCHAR));
         if (pCandidateItem->_ShowFindKeyCode)
         {
-            CharUpperBuffW(pwchWildcard, static_cast<DWORD>(itemWildcard));
+            CharUpperBuffW(pwchFindKeyCode, static_cast<DWORD>(itemFindKeyCode));
         }
     }
 
@@ -800,10 +800,10 @@ void CCandidateWindow::_AddString(_Inout_ CCandidateListItem *pCandidateItem, _I
             delete [] pwchString;
             pwchString = nullptr;
         }
-        if (pwchWildcard)
+        if (pwchFindKeyCode)
         {
-            delete [] pwchWildcard;
-            pwchWildcard = nullptr;
+            delete [] pwchFindKeyCode;
+            pwchFindKeyCode = nullptr;
         }
         return;
     }
@@ -812,9 +812,9 @@ void CCandidateWindow::_AddString(_Inout_ CCandidateListItem *pCandidateItem, _I
     {
         pLI->_ItemString.Set(pwchString, dwItemString);
     }
-    if (pwchWildcard)
+    if (pwchFindKeyCode)
     {
-        pLI->_FindKeyCode.Set(pwchWildcard, itemWildcard);
+        pLI->_FindKeyCode.Set(pwchFindKeyCode, itemFindKeyCode);
     }
     pLI->_ShowFindKeyCode = pCandidateItem->_ShowFindKeyCode;
 

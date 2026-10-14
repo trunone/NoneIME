@@ -96,9 +96,6 @@ HRESULT CKeyStateCategory::KeyStateHandler(KEYSTROKE_FUNCTION function, KeyHandl
     case FUNCTION_CONVERT:
         return HandleKeyConvert(dto);
 
-    case FUNCTION_CONVERT_WILDCARD:
-        return HandleKeyConvertWildCard(dto);
-
     case FUNCTION_CANCEL:
         return HandleKeyCancel(dto);
 
@@ -171,13 +168,6 @@ HRESULT CKeyStateCategory::HandleKeyConvert(KeyHandlerEditSessionDTO dto)
     return E_NOTIMPL;
 }
 
-// HandleKeyConvertWildCard
-HRESULT CKeyStateCategory::HandleKeyConvertWildCard(KeyHandlerEditSessionDTO dto)
-{
-	dto;
-    return E_NOTIMPL;
-}
-
 //_HandleCancel
 HRESULT CKeyStateCategory::HandleKeyCancel(KeyHandlerEditSessionDTO dto)
 {
@@ -241,12 +231,7 @@ HRESULT CKeyStateComposing::HandleKeyFinalizeCandidatelist(KeyHandlerEditSession
 
 HRESULT CKeyStateComposing::HandleKeyConvert(KeyHandlerEditSessionDTO dto)
 {
-    return _pTextService->_HandleCompositionConvert(dto.ec, dto.pContext, FALSE);
-}
-
-HRESULT CKeyStateComposing::HandleKeyConvertWildCard(KeyHandlerEditSessionDTO dto)
-{
-    return _pTextService->_HandleCompositionConvert(dto.ec, dto.pContext, TRUE);
+    return _pTextService->_HandleCompositionConvert(dto.ec, dto.pContext);
 }
 
 HRESULT CKeyStateComposing::HandleKeyCancel(KeyHandlerEditSessionDTO dto)

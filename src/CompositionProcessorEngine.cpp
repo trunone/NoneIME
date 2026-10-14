@@ -111,10 +111,6 @@ CCompositionProcessorEngine::CCompositionProcessorEngine()
     _pCompartmentKeyboardOpenEventSink = nullptr;
     _pCompartmentConversionEventSink = nullptr;
 
-    _hasWildcardIncludedInKeystrokeBuffer = FALSE;
-
-    _isWildcard = FALSE;
-    _isDisableWildcardAtFirst = FALSE;
     _hasMakePhraseFromText = FALSE;
     _isKeystrokeSort = FALSE;
 
@@ -320,12 +316,8 @@ WCHAR CCompositionProcessorEngine::GetVirtualKey(DWORD_PTR dwIndex)
 //
 //----------------------------------------------------------------------------
 
-void CCompositionProcessorEngine::GetReadingStrings(_Inout_ CNoneImeArray<CStringRange> *pReadingStrings, _Out_ BOOL *pIsWildcardIncluded)
+void CCompositionProcessorEngine::GetReadingStrings(_Inout_ CNoneImeArray<CStringRange> *pReadingStrings)
 {
-    CStringRange oneKeystroke;
-
-    _hasWildcardIncludedInKeystrokeBuffer = FALSE;
-
     if (pReadingStrings->Count() == 0 && _keystrokeBuffer.GetLength())
     {
         CStringRange* pNewString = nullptr;
@@ -335,19 +327,7 @@ void CCompositionProcessorEngine::GetReadingStrings(_Inout_ CNoneImeArray<CStrin
         {
             *pNewString = _keystrokeBuffer;
         }
-
-        for (DWORD index = 0; index < _keystrokeBuffer.GetLength(); index++)
-        {
-            oneKeystroke.Set(_keystrokeBuffer.Get() + index, 1);
-
-            if (IsWildcard() && IsWildcardChar(*oneKeystroke.Get()))
-            {
-                _hasWildcardIncludedInKeystrokeBuffer = TRUE;
-            }
-        }
     }
-
-    *pIsWildcardIncluded = _hasWildcardIncludedInKeystrokeBuffer;
 }
 
 //+---------------------------------------------------------------------------
@@ -356,111 +336,25 @@ void CCompositionProcessorEngine::GetReadingStrings(_Inout_ CNoneImeArray<CStrin
 //
 //----------------------------------------------------------------------------
 
-void CCompositionProcessorEngine::GetCandidateList(_Inout_ CNoneImeArray<CCandidateListItem> *pCandidateList, BOOL isIncrementalWordSearch, BOOL isWildcardSearch)
+void CCompositionProcessorEngine::GetCandidateList(_Inout_ CNoneImeArray<CCandidateListItem> *pCandidateList, BOOL isIncrementalWordSearch)
 {
+    isIncrementalWordSearch;
+
     if (!IsDictionaryAvailable())
     {
         return;
     }
 
-    if (isIncrementalWordSearch)
+    _pTableDictionaryEngine->CollectWord(&_keystrokeBuffer, pCandidateList);
+
+    if (0 >= pCandidateList->Count())
     {
-        CStringRange wildcardSearch;
-        DWORD_PTR keystrokeBufLen = _keystrokeBuffer.GetLength() + 2;
-        PWCHAR pwch = new (std::nothrow) WCHAR[ keystrokeBufLen ];
-        if (!pwch)
-        {
-            return;
-        }
-
-        // check keystroke buffer already has wildcard char which end user want wildcard serach
-        DWORD wildcardIndex = 0;
-        BOOL isFindWildcard = FALSE;
-
-        if (IsWildcard())
-        {
-            for (wildcardIndex = 0; wildcardIndex < _keystrokeBuffer.GetLength(); wildcardIndex++)
-            {
-                if (IsWildcardChar(*(_keystrokeBuffer.Get() + wildcardIndex)))
-                {
-                    isFindWildcard = TRUE;
-                    break;
-                }
-            }
-        }
-
-        StringCchCopyN(pwch, keystrokeBufLen, _keystrokeBuffer.Get(), _keystrokeBuffer.GetLength());
-
-        if (!isFindWildcard)
-        {
-            // add wildcard char for incremental search
-            StringCchCat(pwch, keystrokeBufLen, L"*");
-        }
-
-        size_t len = 0;
-        if (StringCchLength(pwch, STRSAFE_MAX_CCH, &len) == S_OK)
-        {
-            wildcardSearch.Set(pwch, len);
-        }
-        else
-        {
-            return;
-        }
-
-        _pTableDictionaryEngine->CollectWordForWildcard(&wildcardSearch, pCandidateList);
-
-        if (0 >= pCandidateList->Count())
-        {
-            return;
-        }
-
-        if (IsKeystrokeSort())
-        {
-            _pTableDictionaryEngine->SortListItemByFindKeyCode(pCandidateList);
-        }
-
-        // Incremental search would show keystroke data from all candidate list items
-        // but wont show identical keystroke data for user inputted.
-        for (UINT index = 0; index < pCandidateList->Count(); index++)
-        {
-            CCandidateListItem *pLI = pCandidateList->GetAt(index);
-            DWORD_PTR keystrokeBufferLen = 0;
-
-            if (IsWildcard())
-            {
-                keystrokeBufferLen = wildcardIndex;
-            }
-            else
-            {
-                keystrokeBufferLen = _keystrokeBuffer.GetLength();
-            }
-
-            CStringRange newFindKeyCode;
-            newFindKeyCode.Set(pLI->_FindKeyCode.Get() + keystrokeBufferLen, pLI->_FindKeyCode.GetLength() - keystrokeBufferLen);
-            pLI->_FindKeyCode.Set(newFindKeyCode);
-        }
-
-        delete [] pwch;
-    }
-    else if (isWildcardSearch)
-    {
-        _pTableDictionaryEngine->CollectWordForWildcard(&_keystrokeBuffer, pCandidateList);
-    }
-    else
-    {
-        _pTableDictionaryEngine->CollectWord(&_keystrokeBuffer, pCandidateList);
+        return;
     }
 
-    for (UINT index = 0; index < pCandidateList->Count();)
+    if (IsKeystrokeSort())
     {
-        CCandidateListItem *pLI = pCandidateList->GetAt(index);
-        CStringRange startItemString;
-        CStringRange endItemString;
-
-        startItemString.Set(pLI->_ItemString.Get(), 1);
-        endItemString.Set(pLI->_ItemString.Get() + pLI->_ItemString.GetLength() - 1, 1);
-
-        index++;
+        _pTableDictionaryEngine->SortListItemByFindKeyCode(pCandidateList);
     }
 }
 
@@ -472,40 +366,9 @@ void CCompositionProcessorEngine::GetCandidateList(_Inout_ CNoneImeArray<CCandid
 
 void CCompositionProcessorEngine::GetCandidateStringInConverted(CStringRange &searchString, _In_ CNoneImeArray<CCandidateListItem> *pCandidateList)
 {
-    if (!IsDictionaryAvailable())
-    {
-        return;
-    }
-
-    // Search phrase from SECTION_TEXT's converted string list
-    CStringRange wildcardSearch;
-    DWORD_PTR srgKeystrokeBufLen = searchString.GetLength() + 2;
-    PWCHAR pwch = new (std::nothrow) WCHAR[ srgKeystrokeBufLen ];
-    if (!pwch)
-    {
-        return;
-    }
-
-    StringCchCopyN(pwch, srgKeystrokeBufLen, searchString.Get(), searchString.GetLength());
-    StringCchCat(pwch, srgKeystrokeBufLen, L"*");
-
-    // add wildcard char
-	size_t len = 0;
-	if (StringCchLength(pwch, STRSAFE_MAX_CCH, &len) != S_OK)
-    {
-        return;
-    }
-    wildcardSearch.Set(pwch, len);
-
-    _pTableDictionaryEngine->CollectWordFromConvertedStringForWildcard(&wildcardSearch, pCandidateList);
-
-    if (IsKeystrokeSort())
-    {
-        _pTableDictionaryEngine->SortListItemByFindKeyCode(pCandidateList);
-    }
-
-    wildcardSearch.Clear();
-    delete [] pwch;
+    searchString;
+    pCandidateList;
+    return;
 }
 
 //+---------------------------------------------------------------------------
@@ -689,8 +552,6 @@ void CCompositionProcessorEngine::OnPreservedKey(REFGUID rguid, _Out_ BOOL *pIsE
 
 void CCompositionProcessorEngine::SetupConfiguration()
 {
-    _isWildcard = TRUE;
-    _isDisableWildcardAtFirst = TRUE;
     _hasMakePhraseFromText = TRUE;
     _isKeystrokeSort = TRUE;
     Global::LoadCandidateWindowSettings();
@@ -1260,8 +1121,10 @@ void CCompositionProcessorEngine::SetDefaultCandidateTextFont()
 //     If engine need this virtual key code, returns true. Otherwise returns false.
 //----------------------------------------------------------------------------
 
-BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCHAR *pwch, BOOL fComposing, CANDIDATE_MODE candidateMode, BOOL hasCandidateWithWildcard, _Out_opt_ _KEYSTROKE_STATE *pKeyState)
+BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCHAR *pwch, BOOL fComposing, CANDIDATE_MODE candidateMode, _Out_opt_ _KEYSTROKE_STATE *pKeyState)
 {
+    pwch;
+
     if (pKeyState)
     {
         pKeyState->Category = CATEGORY_NONE;
@@ -1279,20 +1142,6 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCH
         {
             return TRUE;
         }
-        else if ((IsWildcard() && IsWildcardChar(*pwch) && !IsDisableWildcardAtFirst()) ||
-            (IsWildcard() && IsWildcardChar(*pwch) &&  IsDisableWildcardAtFirst() && _keystrokeBuffer.GetLength()))
-        {
-            if (pKeyState)
-            {
-                pKeyState->Category = CATEGORY_COMPOSING;
-                pKeyState->Function = FUNCTION_INPUT;
-            }
-            return TRUE;
-        }
-        else if (_hasWildcardIncludedInKeystrokeBuffer && uCode == VK_SPACE)
-        {
-            if (pKeyState) { pKeyState->Category = CATEGORY_COMPOSING; pKeyState->Function = FUNCTION_CONVERT_WILDCARD; } return TRUE;
-        }
     }
 
     if (candidateMode == CANDIDATE_ORIGINAL || candidateMode == CANDIDATE_PHRASE || candidateMode == CANDIDATE_WITH_NEXT_COMPOSITION)
@@ -1301,14 +1150,6 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCH
         if (IsVirtualKeyKeystrokeCandidate(uCode, pKeyState, candidateMode, &isRetCode, &_KeystrokeCandidate))
         {
             return isRetCode;
-        }
-
-        if (hasCandidateWithWildcard)
-        {
-            if (IsVirtualKeyKeystrokeCandidate(uCode, pKeyState, candidateMode, &isRetCode, &_KeystrokeCandidateWildcard))
-            {
-                return isRetCode;
-            }
         }
 
         // Candidate list could not handle key. We can try to restart the composition.

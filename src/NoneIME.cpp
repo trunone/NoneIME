@@ -76,7 +76,6 @@ CNoneIME::CNoneIME()
 
     _candidateMode = CANDIDATE_NONE;
     _pCandidateListUIPresenter = nullptr;
-    _isCandidateWithWildcard = FALSE;
     _isErrorCandidate = FALSE;
 
     _pDocMgrLastFocused = nullptr;
@@ -307,7 +306,6 @@ STDAPI CNoneIME::Deactivate()
         }
 
         _candidateMode = CANDIDATE_NONE;
-        _isCandidateWithWildcard = FALSE;
     }
 
     _UninitFunctionProviderSink();

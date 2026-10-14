@@ -24,8 +24,4 @@ public:
     //     none.
     VOID CollectWord(_In_ CStringRange *pKeyCode, _Inout_ CNoneImeArray<CStringRange> *pWordStrings);
     VOID CollectWord(_In_ CStringRange *pKeyCode, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
-
-    VOID CollectWordForWildcard(_In_ CStringRange *psrgKeyCode, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
-
-    VOID CollectWordFromConvertedStringForWildcard(_In_ CStringRange *pString, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
 };
