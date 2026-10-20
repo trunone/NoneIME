@@ -44,12 +44,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "MSFT"
             VALUE "FileDescription", "None IME - Boshiamy Traditional Chinese Input Method"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileVersion", "f4771d0"
             VALUE "InternalName", "NoneIME.dll"
             VALUE "LegalCopyright", "Copyright (C)"
             VALUE "OriginalFilename", "NoneIME.dll"
             VALUE "ProductName", "None IME"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductVersion", "f4771d0"
         END
     END
     BLOCK "VarFileInfo"

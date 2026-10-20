@@ -7,6 +7,19 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+$commitHash = (git rev-parse --short=7 HEAD)
+if ($commitHash) {
+    $commitHash = $commitHash.Trim()
+    $rcPath = Join-Path $PSScriptRoot 'NoneIME.rc'
+    if (Test-Path $rcPath) {
+        $rcContent = Get-Content -Path $rcPath -Raw -Encoding UTF8
+        $rcContent = $rcContent -replace 'VALUE "FileVersion", "[^"]*"', "VALUE `"FileVersion`", `"$commitHash`""
+        $rcContent = $rcContent -replace 'VALUE "ProductVersion", "[^"]*"', "VALUE `"ProductVersion`", `"$commitHash`""
+        Set-Content -Path $rcPath -Value $rcContent -Encoding UTF8
+    }
+}
+
 $solutionPath = Join-Path $PSScriptRoot 'NoneIME.sln'
 if (-not (Test-Path $solutionPath)) {
     throw "Solution not found: $solutionPath"
