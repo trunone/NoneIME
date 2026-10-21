@@ -76,7 +76,7 @@ __inline UINT VKeyFromVKPacketAndWchar(UINT vk, WCHAR wch)
     return vkRet;
 }
 
-BOOL IsBoshiamyKeyCharacter(UINT vk, WCHAR wch)
+BOOL IsNoneIMEKeyCharacter(UINT vk, WCHAR wch)
 {
     switch (vk)
     {
@@ -162,7 +162,7 @@ BOOL CNoneIME::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT *p
         //
         // eat only keys that CKeyHandlerEditSession can handles.
         //
-        if (IsBoshiamyKeyCharacter(*pCodeOut, wch) &&
+        if (IsNoneIMEKeyCharacter(*pCodeOut, wch) &&
             pCompositionProcessorEngine->IsVirtualKeyNeed(*pCodeOut, pwch, _IsComposing(), _candidateMode, pKeyState))
         {
             return TRUE;

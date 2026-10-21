@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Dictionary\Boshiamy.cin" />
-    <None Include="Dictionary\Boshiamy-GPL-3.0.txt" />
-    <None Include="Dictionary\Boshiamy-README.md" />
+    <None Include="Dictionary\NoneIME.cin" />
+    <None Include="Dictionary\NoneIME-GPL-3.0.txt" />
+    <None Include="Dictionary\NoneIME-README.md" />
     <None Include="NoneIME.ini" />
     <None Include="image\DoubleSingleByteOff.ico" />
     <None Include="image\DoubleSingleByteOn.ico" />
@@ -272,7 +272,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="CopyRuntimeFiles" AfterTargets="Build">
     <Copy SourceFiles="$(ProjectDir)NoneIME.ini" DestinationFolder="$(TargetDir)" />
-    <Copy SourceFiles="$(ProjectDir)Dictionary\Boshiamy.cin" DestinationFolder="$(TargetDir)" Condition="Exists('$(ProjectDir)Dictionary\Boshiamy.cin')" />
+    <Copy SourceFiles="$(ProjectDir)Dictionary\NoneIME.cin" DestinationFolder="$(TargetDir)" Condition="Exists('$(ProjectDir)Dictionary\NoneIME.cin')" />
   </Target>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

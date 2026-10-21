@@ -223,7 +223,7 @@ BOOL CCompositionProcessorEngine::AddVirtualKey(WCHAR wch)
         return FALSE;
     }
 
-    // Boshiamy composition accepts at most five keystrokes/root characters.
+    // None IME composition accepts at most five keystrokes/root characters.
     // Reject any extra input instead of growing the composition buffer.
     if (_keystrokeBuffer.GetLength() >= 5)
     {

@@ -37,7 +37,7 @@ if (-not (Test-Path -LiteralPath $DllPath -PathType Leaf)) {
 
 $dictionaryDirectory = Split-Path -Parent $DllPath
 $iniPath = Join-Path $dictionaryDirectory 'NoneIME.ini'
-$cinFileName = 'Boshiamy.cin'
+$cinFileName = 'NoneIME.cin'
 if (Test-Path -LiteralPath $iniPath -PathType Leaf) {
     $section = ''
     foreach ($line in [System.IO.File]::ReadAllLines($iniPath, [System.Text.Encoding]::UTF8)) {
