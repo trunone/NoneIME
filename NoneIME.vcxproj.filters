@@ -21,13 +21,13 @@
     <None Include="NoneIME.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="Dictionary\Boshiamy.cin">
+    <None Include="Dictionary\NoneIME.cin">
       <Filter>Dictionary</Filter>
     </None>
-    <None Include="Dictionary\Boshiamy-GPL-3.0.txt">
+    <None Include="Dictionary\NoneIME-GPL-3.0.txt">
       <Filter>Dictionary</Filter>
     </None>
-    <None Include="Dictionary\Boshiamy-README.md">
+    <None Include="Dictionary\NoneIME-README.md">
       <Filter>Dictionary</Filter>
     </None>
     <None Include="image\NoneIME.ico">

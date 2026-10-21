@@ -43,7 +43,7 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "MSFT"
-            VALUE "FileDescription", "None IME - Boshiamy Traditional Chinese Input Method"
+            VALUE "FileDescription", "None IME - Traditional Chinese Input Method"
             VALUE "FileVersion", "f4771d0"
             VALUE "InternalName", "NoneIME.dll"
             VALUE "LegalCopyright", "Copyright (C)"
@@ -91,7 +91,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDIS_NONEIME            "Boshiamy (Traditional Chinese)"
+    IDIS_NONEIME            "None IME (Traditional Chinese)"
     IDS_DEFAULT_FONT        "Microsoft JhengHei UI"
 END
 
