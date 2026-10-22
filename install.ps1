@@ -35,34 +35,6 @@ if (-not (Test-Path -LiteralPath $DllPath -PathType Leaf)) {
     throw "IME DLL not found: $DllPath. Build it first or provide -DllPath."
 }
 
-$dictionaryDirectory = Split-Path -Parent $DllPath
-$iniPath = Join-Path $dictionaryDirectory 'NoneIME.ini'
-$cinFileName = 'NoneIME.cin'
-if (Test-Path -LiteralPath $iniPath -PathType Leaf) {
-    $section = ''
-    foreach ($line in [System.IO.File]::ReadAllLines($iniPath, [System.Text.Encoding]::UTF8)) {
-        if ($line -match '^\s*\[([^\]]+)\]\s*$') {
-            $section = $matches[1]
-            continue
-        }
-        if ($section -ieq 'Dictionary' -and $line -match '^\s*CinPath\s*=\s*(.*?)\s*$') {
-            if ($matches[1]) {
-                $cinFileName = $matches[1]
-            }
-            break
-        }
-    }
-}
-$cinDictionaryPath = if ([System.IO.Path]::IsPathRooted($cinFileName)) {
-    $cinFileName
-} else {
-    Join-Path $dictionaryDirectory $cinFileName
-}
-$cinDictionaryPath = [System.IO.Path]::GetFullPath($cinDictionaryPath)
-if (-not (Test-Path -LiteralPath $cinDictionaryPath -PathType Leaf)) {
-    throw "Configured CIN dictionary not found: $cinDictionaryPath"
-}
-
 if ($Platform -eq 'x64') {
     if (-not [Environment]::Is64BitOperatingSystem) {
         throw 'The x64 IME cannot be installed on a 32-bit version of Windows.'

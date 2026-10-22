@@ -21,7 +21,7 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 
 可在 DLL 同層的 INI 檔 `[CandidateWindow]` 區段調整 `CandidateFontSize`（字級，點）及 `HighlightColor`（RGB 色碼，例如 `0078D7`）。候選視窗使用固定最小寬度，較長的候選內容會自動加寬。設定會在輸入法初始化時讀取。建置不會自動安裝或註冊輸入法。
 
-可在 `NoneIME.ini` 的 `[Dictionary]` 區段設定 `CinPath`；相對路徑以 DLL/INI 所在目錄為基準，也可指定絕對路徑。預設值為 `NoneIME.cin`，安裝器也會依此設定檢查碼表是否存在。
+可在 `NoneIME.ini` 的 `[Dictionary]` 區段設定 `CinPath`；相對路徑以 DLL/INI 所在目錄為基準，也可指定絕對路徑。預設值為 `NoneIME.cin`。
 
 ## 安裝與移除
 
@@ -31,7 +31,7 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 ./install.ps1
 ```
 
-可用 `-Configuration Release -Platform x64` 或 `-Platform Win32` 指定其他版本；若要註冊其他位置的 DLL，請使用 `-DllPath`，並將 `NoneIME.cin` 放在 DLL 同一目錄。移除時請使用對應的參數：
+可用 `-Configuration Release -Platform x64` 或 `-Platform Win32` 指定其他版本；若要註冊其他位置的 DLL，請使用 `-DllPath`。移除時請使用對應的參數：
 
 ```powershell
 ./uninstall.ps1
