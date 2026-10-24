@@ -19,9 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Dictionary\NoneIME.cin" />
-    <None Include="Dictionary\NoneIME-GPL-3.0.txt" />
-    <None Include="Dictionary\NoneIME-README.md" />
+    <None Include="Dictionary\boshiamy.bin" />
     <None Include="NoneIME.ini" />
     <None Include="image\DoubleSingleByteOff.ico" />
     <None Include="image\DoubleSingleByteOn.ico" />
@@ -45,13 +43,9 @@
     <ClInclude Include="include\KeyStateCategory.h" />
     <ClInclude Include="include\NoneIMEBaseStructure.h" />
     <ClInclude Include="include\SearchCandidateProvider.h" />
-    <ClInclude Include="include\DictionaryParser.h" />
-    <ClInclude Include="include\DictionarySearch.h" />
     <ClInclude Include="include\DisplayAttributeInfo.h" />
     <ClInclude Include="include\EditSession.h" />
     <ClInclude Include="include\EnumDisplayAttributeInfo.h" />
-    <ClInclude Include="include\File.h" />
-    <ClInclude Include="include\FileMapping.h" />
     <ClInclude Include="include\GetTextExtentEditSession.h" />
     <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\KeyHandlerEditSession.h" />
@@ -83,8 +77,6 @@
     <ClCompile Include="src\KeyStateCategory.cpp" />
     <ClCompile Include="src\NoneIMEBaseStructure.cpp" />
     <ClCompile Include="src\SearchCandidateProvider.cpp" />
-    <ClCompile Include="src\DictionaryParser.cpp" />
-    <ClCompile Include="src\DictionarySearch.cpp" />
     <ClCompile Include="src\DisplayAttribute.cpp" />
     <ClCompile Include="src\DisplayAttributeInfo.cpp" />
     <ClCompile Include="src\DisplayAttributeProvider.cpp" />
@@ -92,8 +84,6 @@
     <ClCompile Include="src\EditSession.cpp" />
     <ClCompile Include="src\EndComposition.cpp" />
     <ClCompile Include="src\EnumDisplayAttributeInfo.cpp" />
-    <ClCompile Include="src\File.cpp" />
-    <ClCompile Include="src\FileMapping.cpp" />
     <ClCompile Include="src\FunctionProviderSink.cpp" />
     <ClCompile Include="src\GetTextExtentEditSession.cpp" />
     <ClCompile Include="src\Globals.cpp" />
@@ -272,7 +262,6 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="CopyRuntimeFiles" AfterTargets="Build">
     <Copy SourceFiles="$(ProjectDir)NoneIME.ini" DestinationFolder="$(TargetDir)" />
-    <Copy SourceFiles="$(ProjectDir)Dictionary\NoneIME.cin" DestinationFolder="$(TargetDir)" Condition="Exists('$(ProjectDir)Dictionary\NoneIME.cin')" />
   </Target>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

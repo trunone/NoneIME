@@ -17,11 +17,9 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 ./build.ps1 -Configuration Release -Platform x64
 ```
 
-腳本會尋找 MSBuild 並建置 `NoneIME.sln`。DLL、執行時字典及 `NoneIME.ini` 會輸出至 `bin/<Platform>/<Configuration>/`，中間檔案則位於 `obj/<Platform>/<Configuration>/`。
+腳本會尋找 MSBuild 並建置 `NoneIME.sln`。DLL 及 `NoneIME.ini` 會輸出至 `bin/<Platform>/<Configuration>/`，中間檔案則位於 `obj/<Platform>/<Configuration>/`。
 
 可在 DLL 同層的 INI 檔 `[CandidateWindow]` 區段調整 `CandidateFontSize`（字級，點）及 `HighlightColor`（RGB 色碼，例如 `0078D7`）。候選視窗使用固定最小寬度，較長的候選內容會自動加寬。設定會在輸入法初始化時讀取。建置不會自動安裝或註冊輸入法。
-
-可在 `NoneIME.ini` 的 `[Dictionary]` 區段設定 `CinPath`；相對路徑以 DLL/INI 所在目錄為基準，也可指定絕對路徑。預設值為 `NoneIME.cin`。
 
 ## 安裝與移除
 
@@ -39,20 +37,21 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 
 腳本只註冊或取消註冊 TSF/COM 元件，不會複製或刪除建置檔案。若 Windows 拒絕註冊，請以系統管理員身分執行 PowerShell。安裝後，請到 Windows 的語言與鍵盤設定啟用 None IME。
 
-## 字典資料
+## 字典資料與檢索演算法
 
-嘸蝦米碼表來源為 [jdh8/ibus-boshiamy](https://github.com/jdh8/ibus-boshiamy)，採用 commit `9a8f5dadd8dbb95b0376ac19c7b03826e64a1bbb` 的資料。將上游 UTF-8 `.cin` 檔命名為 `NoneIME.cin` 放入 `Dictionary`，建置時會直接複製到輸出目錄並由輸入法載入，不需預先轉換：
+字表來源為 [chinese-opendesktop/cin-tables](https://raw.githubusercontent.com/chinese-opendesktop/cin-tables/refs/heads/master/boshiamy.cin) 的 `boshiamy.cin`。
 
-```powershell
-Copy-Item C:\data\noneime.cin Dictionary\NoneIME.cin
-./build.ps1 -Configuration Release -Platform x64
-```
-
-目前版本未附獨立的字表授權說明文件；字表授權標示及注意事項見下方「授權」。
+輸入法不再於執行時期讀取 `.cin` 文字檔，而是預先編譯為二進位碼表檔 `boshiamy.bin` 並以 `RCDATA` 資源（`IDR_DICTIONARY_DATA`）直接內嵌於 DLL 中：
+1. **二進位碼表檔案結構 (`boshiamy.bin`)**：
+   - **檔頭 (`DictHeader`)**：包含 Magic Code (`NIME`)、版本號、索引項數與候選字總數。
+   - **索引表 (`DictIndexEntry[]`)**：將所有字根 Key 依 ASCII 順序排序，每個項目包含字根字集（`key`）、候選字陣列起始偏移量（`phraseOffset`）及數量（`phraseCount`）。
+   - **候選字表 (`wchar_t[]`)**：緊密排列的 16-bit Unicode UTF-16 候選字元。
+2. **記憶體零複製與高效二分搜尋**：輸入法載入 DLL 時，透過 `LockResource` 直接取得進程記憶體中的二進位資源指標，無須額外分配堆記憶體或動態字串解析。使用者輸入字根時，直接在二進位索引區進行 $O(\log N)$ 階層的二分搜尋（21,949 個獨立字根 Key 僅需約 14 次比較），達到極高檢索效率與零延遲反應。
 
 ## 授權
 
 本專案由作者持有著作權且有權授權的原創部分採 MIT License；第三方程式碼、字典及資料不包含在此授權範圍內。目前儲存庫未附 MIT 授權全文，正式以 MIT 發行時應一併附上授權本文及權利人資訊，並確認只涵蓋有權授權的內容。
 
-TSF 實作改編自 [Microsoft Windows-classic-samples](https://github.com/microsoft/Windows-classic-samples) 的範例；該專案採 MIT License。本專案保留範例程式碼中的 Microsoft 著作權與免責聲明，散布改編部分時亦須保留 MIT 授權要求的著作權及許可聲明。嘸蝦米字表來自 [jdh8/ibus-boshiamy](https://github.com/jdh8/ibus-boshiamy)：上游 README 宣告 GPLv3-or-later（GPLv3+），字表不屬於 MIT 授權，重新散布時須遵守上游授權及保留相關聲明。
+TSF 實作改編自 [Microsoft Windows-classic-samples](https://github.com/microsoft/Windows-classic-samples) 的範例；該專案採 MIT License。本專案保留範例程式碼中的 Microsoft 著作權與免責聲明，散布改編部分時亦須保留 MIT 授權要求的著作權及許可聲明。
 
+嘸蝦米字表來自 [chinese-opendesktop/cin-tables](https://github.com/chinese-opendesktop/cin-tables)（`boshiamy.cin`）

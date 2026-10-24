@@ -5,14 +5,12 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-
 #pragma once
 
 #include "sal.h"
 #include "TableDictionaryEngine.h"
 #include "KeyHandlerEditSession.h"
 #include "NoneIMEBaseStructure.h"
-#include "FileMapping.h"
 #include "Compartment.h"
 #include "define.h"
 
@@ -97,9 +95,7 @@ private:
     void PrivateCompartmentsUpdated(_In_ ITfThreadMgr *pThreadMgr);
     void KeyboardOpenCompartmentUpdated(_In_ ITfThreadMgr *pThreadMgr);
 
-    
     BOOL SetupDictionaryFile();
-    CFile* GetDictionaryFile();
 
 private:
     struct _KEYSTROKE
@@ -160,8 +156,5 @@ private:
     CCandidateRange _candidateListIndexRange;
     UINT _candidateListPhraseModifier;
 
-    CFile* _pDictionaryFile;
-
     static const int OUT_OF_FILE_INDEX = -1;
 };
-

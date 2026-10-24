@@ -9,7 +9,6 @@
 #include "NoneIME.h"
 #include "CompositionProcessorEngine.h"
 #include "TableDictionaryEngine.h"
-#include "DictionarySearch.h"
 #include "TfInputProcessorProfile.h"
 #include "Globals.h"
 #include "Compartment.h"
@@ -99,7 +98,6 @@ BOOL CNoneIME::_AddTextProcessorEngine()
 CCompositionProcessorEngine::CCompositionProcessorEngine()
 {
     _pTableDictionaryEngine = nullptr;
-    _pDictionaryFile = nullptr;
 
     _langid = 0xffff;
     _guidProfile = GUID_NULL;
@@ -156,12 +154,6 @@ CCompositionProcessorEngine::~CCompositionProcessorEngine()
         _pCompartmentConversionEventSink->_Unadvise();
         delete _pCompartmentConversionEventSink;
         _pCompartmentConversionEventSink = nullptr;
-    }
-
-    if (_pDictionaryFile)
-    {
-        delete _pDictionaryFile;
-        _pDictionaryFile = nullptr;
     }
 }
 
@@ -639,53 +631,13 @@ BOOL CCompositionProcessorEngine::InitLanguageBar(_In_ CLangBarItemButton *pLang
 
 BOOL CCompositionProcessorEngine::SetupDictionaryFile()
 {	
-    WCHAR wszFileName[MAX_PATH] = {'\0'};
-    DWORD cchA = GetModuleFileName(Global::dllInstanceHandle, wszFileName, ARRAYSIZE(wszFileName));
-    if (cchA == 0 || cchA >= ARRAYSIZE(wszFileName))
-    {
-        return FALSE;
-    }
-
-    while (cchA > 0 && wszFileName[cchA - 1] != L'\\' && wszFileName[cchA - 1] != L'/')
-    {
-        cchA--;
-    }
-    if (cchA == 0)
-    {
-        return FALSE;
-    }
-    wszFileName[cchA] = L'\0';
-
-    WCHAR dictionaryFileName[MAX_PATH] = {'\0'};
-    if (!Global::GetConfiguredCinPath(dictionaryFileName, ARRAYSIZE(dictionaryFileName)))
-    {
-        return FALSE;
-    }
-
-    _pDictionaryFile = new (std::nothrow) CFile(CP_UTF8);
-    if (!_pDictionaryFile || !_pDictionaryFile->CreateFile(dictionaryFileName, GENERIC_READ, OPEN_EXISTING, FILE_SHARE_READ))
-    {
-        return FALSE;
-    }
-
-    _pTableDictionaryEngine = new (std::nothrow) CTableDictionaryEngine(GetLocale(), _pDictionaryFile);
+    _pTableDictionaryEngine = new (std::nothrow) CTableDictionaryEngine(GetLocale());
     if (!_pTableDictionaryEngine)
     {
         return FALSE;
     }
 
     return TRUE;
-}
-
-//+---------------------------------------------------------------------------
-//
-// GetDictionaryFile
-//
-//----------------------------------------------------------------------------
-
-CFile* CCompositionProcessorEngine::GetDictionaryFile()
-{
-    return _pDictionaryFile;
 }
 
 void CCompositionProcessorEngine::InitializeNoneIMECompartment(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId)

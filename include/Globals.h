@@ -111,7 +111,6 @@ extern CRITICAL_SECTION CS;
 extern HFONT defaultlFontHandle;  // Global font object we use everywhere
 extern UINT candidateFontSize;
 extern COLORREF candidateHighlightColor;
-BOOL GetConfiguredCinPath(_Out_writes_(cchPath) LPWSTR cinPath, size_t cchPath);
 void LoadCandidateWindowSettings();
 
 extern const CLSID NoneIMECLSID;

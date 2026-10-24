@@ -21,13 +21,7 @@
     <None Include="NoneIME.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="Dictionary\NoneIME.cin">
-      <Filter>Dictionary</Filter>
-    </None>
-    <None Include="Dictionary\NoneIME-GPL-3.0.txt">
-      <Filter>Dictionary</Filter>
-    </None>
-    <None Include="Dictionary\NoneIME-README.md">
+    <None Include="Dictionary\boshiamy.bin">
       <Filter>Dictionary</Filter>
     </None>
     <None Include="image\NoneIME.ico">
@@ -71,12 +65,6 @@
     <ClInclude Include="include\CompositionProcessorEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DictionaryParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DictionarySearch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\DisplayAttributeInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -84,12 +72,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\EnumDisplayAttributeInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\File.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\FileMapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GetTextExtentEditSession.h">
@@ -184,12 +166,6 @@
     <ClCompile Include="src\CompositionProcessorEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DictionaryParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DictionarySearch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\DisplayAttribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -209,12 +185,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EnumDisplayAttributeInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\File.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FileMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GetTextExtentEditSession.cpp">
