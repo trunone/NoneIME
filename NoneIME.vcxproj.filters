@@ -24,12 +24,6 @@
     <None Include="Dictionary\boshiamy.bin">
       <Filter>Dictionary</Filter>
     </None>
-    <None Include="Dictionary\NoneIME-GPL-3.0.txt">
-      <Filter>Dictionary</Filter>
-    </None>
-    <None Include="Dictionary\NoneIME-README.md">
-      <Filter>Dictionary</Filter>
-    </None>
     <None Include="image\NoneIME.ico">
       <Filter>Resource Files</Filter>
     </None>

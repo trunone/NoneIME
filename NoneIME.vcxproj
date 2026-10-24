@@ -20,8 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Dictionary\boshiamy.bin" />
-    <None Include="Dictionary\NoneIME-GPL-3.0.txt" />
-    <None Include="Dictionary\NoneIME-README.md" />
     <None Include="NoneIME.ini" />
     <None Include="image\DoubleSingleByteOff.ico" />
     <None Include="image\DoubleSingleByteOn.ico" />
