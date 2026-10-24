@@ -39,48 +39,6 @@ static BOOL GetIniPath(_Out_writes_(cchPath) LPWSTR iniPath, size_t cchPath)
     return SUCCEEDED(StringCchCatW(iniPath, cchPath, L"NoneIME.ini"));
 }
 
-BOOL GetConfiguredCinPath(_Out_writes_(cchPath) LPWSTR cinPath, size_t cchPath)
-{
-    if (cinPath == nullptr || cchPath == 0)
-    {
-        return FALSE;
-    }
-
-    WCHAR iniPath[MAX_PATH] = {};
-    if (!GetIniPath(iniPath, ARRAYSIZE(iniPath)))
-    {
-        return FALSE;
-    }
-
-    WCHAR configuredPath[MAX_PATH] = {};
-    GetPrivateProfileStringW(L"Dictionary", L"CinPath", TEXTSERVICE_CIN,
-        configuredPath, ARRAYSIZE(configuredPath), iniPath);
-    if (!configuredPath[0])
-    {
-        return FALSE;
-    }
-
-    BOOL isAbsolutePath = configuredPath[0] == L'\\' || configuredPath[0] == L'/' || configuredPath[1] == L':';
-    if (isAbsolutePath)
-    {
-        return SUCCEEDED(StringCchCopyW(cinPath, cchPath, configuredPath));
-    }
-
-    WCHAR dictionaryDirectory[MAX_PATH] = {};
-    if (FAILED(StringCchCopyW(dictionaryDirectory, ARRAYSIZE(dictionaryDirectory), iniPath)))
-    {
-        return FALSE;
-    }
-    WCHAR* pathSeparator = wcsrchr(dictionaryDirectory, L'\\');
-    if (pathSeparator == nullptr)
-    {
-        return FALSE;
-    }
-    pathSeparator[1] = L'\0';
-
-    return SUCCEEDED(StringCchCopyW(cinPath, cchPath, dictionaryDirectory)) &&
-        SUCCEEDED(StringCchCatW(cinPath, cchPath, configuredPath));
-}
 
 void LoadCandidateWindowSettings()
 {

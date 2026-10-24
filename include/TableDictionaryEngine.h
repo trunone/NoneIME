@@ -8,20 +8,13 @@
 #pragma once
 
 #include "BaseDictionaryEngine.h"
-#include "FileMapping.h"
 
 class CTableDictionaryEngine : public CBaseDictionaryEngine
 {
 public:
-    CTableDictionaryEngine(LCID locale, _In_ CFile *pDictionaryFile) : CBaseDictionaryEngine(locale, pDictionaryFile) { }
+    CTableDictionaryEngine(LCID locale) : CBaseDictionaryEngine(locale) { }
     virtual ~CTableDictionaryEngine() { }
 
-    // Collect word from phrase string.
-    // param
-    //     [in] psrgKeyCode - Specified key code pointer
-    //     [out] pasrgWordString - Specified returns pointer of word as CStringRange.
-    // returns
-    //     none.
     VOID CollectWord(_In_ CStringRange *pKeyCode, _Inout_ CNoneImeArray<CStringRange> *pWordStrings);
     VOID CollectWord(_In_ CStringRange *pKeyCode, _Inout_ CNoneImeArray<CCandidateListItem> *pItemList);
 };

@@ -13,10 +13,9 @@
 // ctor
 //----------------------------------------------------------------------------
 
-CBaseDictionaryEngine::CBaseDictionaryEngine(LCID locale, _In_ CFile *pDictionaryFile)
+CBaseDictionaryEngine::CBaseDictionaryEngine(LCID locale)
 {
     _locale = locale;
-    _pDictionaryFile = pDictionaryFile;
 }
 
 //+---------------------------------------------------------------------------
