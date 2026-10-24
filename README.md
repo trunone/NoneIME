@@ -41,9 +41,12 @@ None IME 是一款 Windows 繁體中文嘸蝦米輸入法，使用社群維護�
 
 字表來源為 [chinese-opendesktop/cin-tables](https://raw.githubusercontent.com/chinese-opendesktop/cin-tables/refs/heads/master/boshiamy.cin) 的 `boshiamy.cin`。
 
-輸入法不再於執行時期讀取 `.cin` 文字檔，而是直接將字表以高效二進制結構編入 DLL 中：
-1. **二進制索引結構**：將所有字根 Key 依 ASCII 順序排序，建立緊湊的索引結構（`DictIndexEntry`），紀錄每個 Key 對應至候選字陣列的起始偏移量（`phraseOffset`）與候選字數量（`phraseCount`）。
-2. **高效二分搜尋 (Binary Search)**：使用者輸入字根時，輸入法直接在記憶體中的二進制索引進行 $O(\log N)$ 階層的二分搜尋（21,949 個獨立字根 Key 僅需約 14 次比較），無須進行檔案 I/O 或動態字串解析，提供極高的檢索效率與零延遲反應。
+輸入法不再於執行時期讀取 `.cin` 文字檔，而是預先編譯為二進位碼表檔 `boshiamy.bin` 並以 `RCDATA` 資源（`IDR_DICTIONARY_DATA`）直接內嵌於 DLL 中：
+1. **二進位碼表檔案結構 (`boshiamy.bin`)**：
+   - **檔頭 (`DictHeader`)**：包含 Magic Code (`NIME`)、版本號、索引項數與候選字總數。
+   - **索引表 (`DictIndexEntry[]`)**：將所有字根 Key 依 ASCII 順序排序，每個項目包含字根字集（`key`）、候選字陣列起始偏移量（`phraseOffset`）及數量（`phraseCount`）。
+   - **候選字表 (`wchar_t[]`)**：緊密排列的 16-bit Unicode UTF-16 候選字元。
+2. **記憶體零複製與高效二分搜尋**：輸入法載入 DLL 時，透過 `LockResource` 直接取得進程記憶體中的二進位資源指標，無須額外分配堆記憶體或動態字串解析。使用者輸入字根時，直接在二進位索引區進行 $O(\log N)$ 階層的二分搜尋（21,949 個獨立字根 Key 僅需約 14 次比較），達到極高檢索效率與零延遲反應。
 
 ## 授權
 

@@ -21,6 +21,9 @@
     <None Include="NoneIME.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="Dictionary\boshiamy.bin">
+      <Filter>Dictionary</Filter>
+    </None>
     <None Include="Dictionary\NoneIME-GPL-3.0.txt">
       <Filter>Dictionary</Filter>
     </None>
@@ -66,9 +69,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\CompositionProcessorEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\EmbeddedDictionary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\DisplayAttributeInfo.h">
@@ -170,9 +170,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\CompositionProcessorEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EmbeddedDictionary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DisplayAttribute.cpp">
