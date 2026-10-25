@@ -219,12 +219,13 @@ void CCandidateWindow::_ResizeWindow()
         int vscrollWidth = (_isStoreAppMode && _pVScrollBarWnd) ? GetSystemMetrics(SM_CXVSCROLL) * 2 : 0;
         int padding = _TextMetric.tmAveCharWidth;
 
+        int totalMarginOffset = CANDWND_BORDER_WIDTH * 2 + CANDWND_MARGIN * 2;
         _cxTitle = StringPosition * _TextMetric.tmAveCharWidth + candidateWidth +
-            padding + vscrollWidth + CANDWND_BORDER_WIDTH * 2;
+            padding + vscrollWidth + totalMarginOffset;
     }
 
     int cyLine = max(_cyRow, _TextMetric.tmHeight);
-    int windowHeight = cyLine * countOnPage + CANDWND_BORDER_WIDTH * 2;
+    int windowHeight = cyLine * countOnPage + CANDWND_BORDER_WIDTH * 2 + CANDWND_MARGIN * 2;
 
     RECT rcWindow = {0, 0, 0, 0};
     GetWindowRect(_GetWnd(), &rcWindow);
@@ -235,10 +236,10 @@ void CCandidateWindow::_ResizeWindow()
 
     if (_isStoreAppMode && _pVScrollBarWnd)
     {
-        int letf = rcCandRect.right - GetSystemMetrics(SM_CXVSCROLL) * 2 - CANDWND_BORDER_WIDTH;
-        int top = rcCandRect.top + CANDWND_BORDER_WIDTH;
+        int letf = rcCandRect.right - GetSystemMetrics(SM_CXVSCROLL) * 2 - CANDWND_BORDER_WIDTH - CANDWND_MARGIN;
+        int top = rcCandRect.top + CANDWND_BORDER_WIDTH + CANDWND_MARGIN;
         int width = GetSystemMetrics(SM_CXVSCROLL) * 2;
-        int height = rcCandRect.bottom - rcCandRect.top - CANDWND_BORDER_WIDTH * 2;
+        int height = rcCandRect.bottom - rcCandRect.top - (CANDWND_BORDER_WIDTH + CANDWND_MARGIN) * 2;
 
         _pVScrollBarWnd->_Resize(letf, top, width, height);
     }
@@ -540,15 +541,16 @@ void CCandidateWindow::_OnLButtonDown(POINT pt)
     index = *_PageIndex.GetAt(currentPage);
 
     int vscrollWidth = (_isStoreAppMode && _pVScrollBarWnd) ? GetSystemMetrics(SM_CXVSCROLL) * 2 : 0;
+    int margin = CANDWND_MARGIN;
 
     for (UINT pageCount = 0; (index < _candidateList.Count()) && (pageCount < candidateListPageCnt); index++, pageCount++)
     {
         RECT rc = {0, 0, 0, 0};
 
-        rc.left = rcWindow.left;
-        rc.right = rcWindow.right - vscrollWidth;
-        rc.top = rcWindow.top + (pageCount * cyLine);
-        rc.bottom = rcWindow.top + ((pageCount + 1) * cyLine);
+        rc.left = rcWindow.left + margin;
+        rc.right = rcWindow.right - vscrollWidth - margin;
+        rc.top = rcWindow.top + margin + (pageCount * cyLine);
+        rc.bottom = rcWindow.top + margin + ((pageCount + 1) * cyLine);
 
         if (PtInRect(&rc, pt) && _pfnCallback)
         {
@@ -616,12 +618,13 @@ void CCandidateWindow::_OnMouseMove(POINT pt)
 
     RECT rc = {0, 0, 0, 0};
 
-    rc.left   = rcWindow.left;
+    int margin = CANDWND_MARGIN;
+    rc.left   = rcWindow.left + margin;
     int vscrollWidth = (_isStoreAppMode && _pVScrollBarWnd) ? GetSystemMetrics(SM_CXVSCROLL) * 2 : 0;
-    rc.right  = rcWindow.right - vscrollWidth;
+    rc.right  = rcWindow.right - vscrollWidth - margin;
 
-    rc.top    = rcWindow.top;
-    rc.bottom = rcWindow.bottom;
+    rc.top    = rcWindow.top + margin;
+    rc.bottom = rcWindow.bottom - margin;
 
     if (PtInRect(&rc, pt))
     {
@@ -695,6 +698,7 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
     int cxLine = _TextMetric.tmAveCharWidth;
     int cyLine = max(_cyRow, _TextMetric.tmHeight);
     int cyOffset = (cyLine == _cyRow ? (cyLine-_TextMetric.tmHeight)/2 : 0);
+    int margin = CANDWND_MARGIN;
 
     RECT rc;
 
@@ -706,21 +710,22 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
         WCHAR pageCountString[lenOfPageCount] = {'\0'};
         CCandidateListItem* pItemList = nullptr;
 
-        rc.top = prc->top + pageCount * cyLine;
+        rc.top = prc->top + margin + pageCount * cyLine;
         rc.bottom = rc.top + cyLine;
 
-        rc.left = prc->left + PageCountPosition * cxLine;
-        rc.right = prc->left + StringPosition * cxLine;
+        rc.left = prc->left + margin + PageCountPosition * cxLine;
+        rc.right = prc->left + margin + StringPosition * cxLine;
 
         // Number Font Color And BK
         SetTextColor(dcHandle, CANDWND_NUM_COLOR);
         SetBkColor(dcHandle, GetSysColor(COLOR_3DHIGHLIGHT));
 
         StringCchPrintf(pageCountString, ARRAYSIZE(pageCountString), L"%d", (LONG)*_pIndexRange->GetAt(pageCount));
-        ExtTextOut(dcHandle, PageCountPosition * cxLine, pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, pageCountString, lenOfPageCount, NULL);
+        ExtTextOut(dcHandle, prc->left + margin + PageCountPosition * cxLine, prc->top + margin + pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, pageCountString, lenOfPageCount, NULL);
 
-        rc.left = prc->left + StringPosition * cxLine;
-        rc.right = prc->right;
+        rc.left = prc->left + margin + StringPosition * cxLine;
+        int vscrollWidth = (_isStoreAppMode && _pVScrollBarWnd) ? GetSystemMetrics(SM_CXVSCROLL) * 2 : 0;
+        rc.right = prc->right - margin - vscrollWidth;
 
         // Candidate Font Color And BK
         if (_currentSelection != iIndex)
@@ -735,14 +740,14 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
         }
 
         pItemList = _candidateList.GetAt(iIndex);
-        ExtTextOut(dcHandle, StringPosition * cxLine, pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, pItemList->_ItemString.Get(), (DWORD)pItemList->_ItemString.GetLength(), NULL);
+        ExtTextOut(dcHandle, prc->left + margin + StringPosition * cxLine, prc->top + margin + pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, pItemList->_ItemString.Get(), (DWORD)pItemList->_ItemString.GetLength(), NULL);
         if (pItemList->_ShowFindKeyCode && pItemList->_FindKeyCode.GetLength())
         {
             SIZE itemSize = {0, 0};
             SIZE separatorSize = {0, 0};
             SIZE codeSize = {0, 0};
-            int textX = StringPosition * cxLine;
-            int textY = pageCount * cyLine + cyOffset;
+            int textX = prc->left + margin + StringPosition * cxLine;
+            int textY = prc->top + margin + pageCount * cyLine + cyOffset;
             GetTextExtentPoint32(dcHandle, pItemList->_ItemString.Get(),
                 static_cast<int>(pItemList->_ItemString.GetLength()), &itemSize);
             GetTextExtentPoint32(dcHandle, L" [", 2, &separatorSize);
