@@ -942,6 +942,7 @@ BOOL CCandidateListUIPresenter::_MoveSelection(_In_ int offSet)
     {
         if (_isShowMode)
         {
+            _pCandidateWnd->_ResizeToFitCandidates();
             _pCandidateWnd->_InvalidateRect();
         }
         else
@@ -966,6 +967,7 @@ BOOL CCandidateListUIPresenter::_SetSelection(_In_ int selectedIndex)
     {
         if (_isShowMode)
         {
+            _pCandidateWnd->_ResizeToFitCandidates();
             _pCandidateWnd->_InvalidateRect();
         }
         else
@@ -991,6 +993,7 @@ BOOL CCandidateListUIPresenter::_MovePage(_In_ int offSet, _In_ BOOL isCycle)
     {
         if (_isShowMode)
         {
+            _pCandidateWnd->_ResizeToFitCandidates();
             _pCandidateWnd->_InvalidateRect();
         }
         else
