@@ -158,12 +158,42 @@ Exit:
 
 void CCandidateWindow::_ResizeWindow()
 {
+    UINT currentPage = 0;
+    UINT currentPageIndex = 0;
+    UINT countOnPage = 0;
+    UINT candidateListPageCnt = _pIndexRange->Count();
+
+    if (SUCCEEDED(_GetCurrentPage(&currentPage)))
+    {
+        _AdjustPageIndex(currentPage, currentPageIndex);
+        if (currentPageIndex < _candidateList.Count())
+        {
+            countOnPage = _candidateList.Count() - currentPageIndex;
+            if (countOnPage > candidateListPageCnt)
+            {
+                countOnPage = candidateListPageCnt;
+            }
+        }
+    }
+    if (countOnPage == 0 && _candidateList.Count() > 0)
+    {
+        countOnPage = min(_candidateList.Count(), candidateListPageCnt);
+    }
+    if (countOnPage == 0)
+    {
+        countOnPage = candidateListPageCnt;
+    }
+
     HDC dcHandle = GetDC(_GetWnd());
     if (dcHandle)
     {
         HFONT hFontOld = (HFONT)SelectObject(dcHandle, Global::defaultlFontHandle);
         int candidateWidth = 0;
-        for (UINT index = 0; index < _candidateList.Count(); index++)
+
+        UINT startIndex = (countOnPage > 0) ? currentPageIndex : 0;
+        UINT endIndex = startIndex + countOnPage;
+
+        for (UINT index = startIndex; index < endIndex && index < _candidateList.Count(); index++)
         {
             CCandidateListItem* pItem = _candidateList.GetAt(index);
             SIZE candidateSize = {0, 0};
@@ -186,25 +216,32 @@ void CCandidateWindow::_ResizeWindow()
         SelectObject(dcHandle, hFontOld);
         ReleaseDC(_GetWnd(), dcHandle);
 
+        int vscrollWidth = (_isStoreAppMode && _pVScrollBarWnd) ? GetSystemMetrics(SM_CXVSCROLL) * 2 : 0;
+        int padding = _TextMetric.tmAveCharWidth;
+
         _cxTitle = StringPosition * _TextMetric.tmAveCharWidth + candidateWidth +
-            2 * GetSystemMetrics(SM_CXVSCROLL) + CANDWND_BORDER_WIDTH +
-            2 * GetSystemMetrics(SM_CXFRAME);
+            padding + vscrollWidth + CANDWND_BORDER_WIDTH * 2;
     }
 
-    int candidateListPageCnt = _pIndexRange->Count();
+    int cyLine = max(_cyRow, _TextMetric.tmHeight);
+    int windowHeight = cyLine * countOnPage + CANDWND_BORDER_WIDTH * 2;
+
     RECT rcWindow = {0, 0, 0, 0};
     GetWindowRect(_GetWnd(), &rcWindow);
-    CBaseWindow::_Resize(rcWindow.left, rcWindow.top, _cxTitle, _cyRow * candidateListPageCnt);
+    CBaseWindow::_Resize(rcWindow.left, rcWindow.top, _cxTitle, windowHeight);
 
     RECT rcCandRect = {0, 0, 0, 0};
     _GetClientRect(&rcCandRect);
 
-    int letf = rcCandRect.right - GetSystemMetrics(SM_CXVSCROLL) * 2 - CANDWND_BORDER_WIDTH;
-    int top = rcCandRect.top + CANDWND_BORDER_WIDTH;
-    int width = GetSystemMetrics(SM_CXVSCROLL) * 2;
-    int height = rcCandRect.bottom - rcCandRect.top - CANDWND_BORDER_WIDTH * 2;
+    if (_isStoreAppMode && _pVScrollBarWnd)
+    {
+        int letf = rcCandRect.right - GetSystemMetrics(SM_CXVSCROLL) * 2 - CANDWND_BORDER_WIDTH;
+        int top = rcCandRect.top + CANDWND_BORDER_WIDTH;
+        int width = GetSystemMetrics(SM_CXVSCROLL) * 2;
+        int height = rcCandRect.bottom - rcCandRect.top - CANDWND_BORDER_WIDTH * 2;
 
-    _pVScrollBarWnd->_Resize(letf, top, width, height);
+        _pVScrollBarWnd->_Resize(letf, top, width, height);
+    }
 }
 
 void CCandidateWindow::_ResizeToFitCandidates()
@@ -485,10 +522,10 @@ cleanup:
 
 void CCandidateWindow::_OnLButtonDown(POINT pt)
 {
-    RECT rcWindow = {0, 0, 0, 0};;
+    RECT rcWindow = {0, 0, 0, 0};
     _GetClientRect(&rcWindow);
 
-    int cyLine = _cyRow;
+    int cyLine = max(_cyRow, _TextMetric.tmHeight);
     
     UINT candidateListPageCnt = _pIndexRange->Count();
     UINT index = 0;
@@ -502,12 +539,14 @@ void CCandidateWindow::_OnLButtonDown(POINT pt)
     // Hit test on list items
     index = *_PageIndex.GetAt(currentPage);
 
+    int vscrollWidth = (_isStoreAppMode && _pVScrollBarWnd) ? GetSystemMetrics(SM_CXVSCROLL) * 2 : 0;
+
     for (UINT pageCount = 0; (index < _candidateList.Count()) && (pageCount < candidateListPageCnt); index++, pageCount++)
     {
         RECT rc = {0, 0, 0, 0};
 
         rc.left = rcWindow.left;
-        rc.right = rcWindow.right - GetSystemMetrics(SM_CXVSCROLL) * 2;
+        rc.right = rcWindow.right - vscrollWidth;
         rc.top = rcWindow.top + (pageCount * cyLine);
         rc.bottom = rcWindow.top + ((pageCount + 1) * cyLine);
 
@@ -578,7 +617,8 @@ void CCandidateWindow::_OnMouseMove(POINT pt)
     RECT rc = {0, 0, 0, 0};
 
     rc.left   = rcWindow.left;
-    rc.right  = rcWindow.right - GetSystemMetrics(SM_CXVSCROLL) * 2;
+    int vscrollWidth = (_isStoreAppMode && _pVScrollBarWnd) ? GetSystemMetrics(SM_CXVSCROLL) * 2 : 0;
+    rc.right  = rcWindow.right - vscrollWidth;
 
     rc.top    = rcWindow.top;
     rc.bottom = rcWindow.bottom;
@@ -615,22 +655,27 @@ void CCandidateWindow::_OnVScroll(DWORD dwSB, _In_ DWORD nPos)
     {
     case SB_LINEDOWN:
         _SetSelectionOffset(+1);
+        _ResizeToFitCandidates();
         _InvalidateRect();
         break;
     case SB_LINEUP:
         _SetSelectionOffset(-1);
+        _ResizeToFitCandidates();
         _InvalidateRect();
         break;
     case SB_PAGEDOWN:
         _MovePage(+1, FALSE);
+        _ResizeToFitCandidates();
         _InvalidateRect();
         break;
     case SB_PAGEUP:
         _MovePage(-1, FALSE);
+        _ResizeToFitCandidates();
         _InvalidateRect();
         break;
     case SB_THUMBPOSITION:
         _SetSelection(nPos, FALSE);
+        _ResizeToFitCandidates();
         _InvalidateRect();
         break;
     }
@@ -708,16 +753,6 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
                 pItemList->_FindKeyCode.Get(), static_cast<int>(pItemList->_FindKeyCode.GetLength()));
             TextOut(dcHandle, textX + itemSize.cx + separatorSize.cx + codeSize.cx, textY, L"]", 1);
         }
-    }
-    for (; (pageCount < candidateListPageCnt); pageCount++)
-    {
-        rc.top    = prc->top + pageCount * cyLine;
-        rc.bottom = rc.top + cyLine;
-
-        rc.left   = prc->left + PageCountPosition * cxLine;
-        rc.right  = prc->left + StringPosition * cxLine;
-
-        FillRect(dcHandle, &rc, (HBRUSH)(COLOR_3DHIGHLIGHT+1));
     }
 }
 
