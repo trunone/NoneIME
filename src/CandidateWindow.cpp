@@ -74,12 +74,6 @@ BOOL CCandidateWindow::_Create(ATOM atom, _In_opt_ HWND parentWndHandle)
         goto Exit;
     }
 
-    ret = _CreateBackGroundShadowWindow();
-    if (FALSE == ret)
-    {
-        goto Exit;
-    }
-
     ret = _CreateVScrollWindow();
     if (FALSE == ret)
     {
@@ -109,20 +103,6 @@ BOOL CCandidateWindow::_CreateMainWindow(ATOM atom, _In_opt_ HWND parentWndHandl
 
 BOOL CCandidateWindow::_CreateBackGroundShadowWindow()
 {
-    _pShadowWnd = new (std::nothrow) CShadowWindow(this);
-    if (_pShadowWnd == nullptr)
-    {
-        return FALSE;
-    }
-
-    if (!_pShadowWnd->_Create(Global::AtomShadowWindow,
-        WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_LAYERED,
-        WS_DISABLED | WS_POPUP, this))
-    {
-        _DeleteShadowWnd();
-        return FALSE;
-    }
-
     return TRUE;
 }
 
