@@ -111,6 +111,7 @@ extern CRITICAL_SECTION CS;
 extern HFONT defaultlFontHandle;  // Global font object we use everywhere
 extern UINT candidateFontSize;
 extern COLORREF candidateHighlightColor;
+extern BOOL hideCandidateWindow;
 void LoadCandidateWindowSettings();
 
 extern const CLSID NoneIMECLSID;
