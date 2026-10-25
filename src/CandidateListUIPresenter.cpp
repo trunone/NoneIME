@@ -142,7 +142,7 @@ HRESULT CNoneIME::_HandleCandidateWorker(TfEditCookie ec, _In_ ITfContext *pCont
         pTempCandListUIPresenter = new (std::nothrow) CCandidateListUIPresenter(this, Global::AtomCandidateWindow,
             CATEGORY_CANDIDATE,
             _pCompositionProcessorEngine->GetCandidateListIndexRange(),
-            FALSE);
+            Global::hideCandidateWindow);
         if (nullptr == pTempCandListUIPresenter)
         {
             hrReturn = E_OUTOFMEMORY;

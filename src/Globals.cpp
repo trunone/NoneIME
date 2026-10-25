@@ -21,6 +21,7 @@ CRITICAL_SECTION CS;
 HFONT defaultlFontHandle;				// Global font object we use everywhere
 UINT candidateFontSize = 14;
 COLORREF candidateHighlightColor = CANDWND_SELECTED_BK_COLOR;
+BOOL hideCandidateWindow = FALSE;
 
 static BOOL GetIniPath(_Out_writes_(cchPath) LPWSTR iniPath, size_t cchPath)
 {
@@ -69,6 +70,9 @@ void LoadCandidateWindowSettings()
     {
         candidateHighlightColor = RGB((colorValue >> 16) & 0xFF, (colorValue >> 8) & 0xFF, colorValue & 0xFF);
     }
+
+    hideCandidateWindow = (GetPrivateProfileIntW(L"CandidateWindow", L"HideCandidateWindow", 0, iniPath) != 0) ||
+                          (GetPrivateProfileIntW(L"CandidateWindow", L"HideWindow", 0, iniPath) != 0);
 }
 
 //---------------------------------------------------------------------

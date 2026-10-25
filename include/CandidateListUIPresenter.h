@@ -34,7 +34,7 @@ public:
     CCandidateListUIPresenter(_In_ CNoneIME *pTextService, ATOM atom,
         KEYSTROKE_CATEGORY Category,
         _In_ CCandidateRange *pIndexRange,
-        BOOL hideWindow);
+        BOOL hideWindow = Global::hideCandidateWindow);
     virtual ~CCandidateListUIPresenter();
 
     // IUnknown

@@ -248,7 +248,7 @@ HRESULT CNoneIME::_CreateAndStartCandidate(_In_ CCompositionProcessorEngine *pCo
         _pCandidateListUIPresenter = new (std::nothrow) CCandidateListUIPresenter(this, Global::AtomCandidateWindow,
             CATEGORY_CANDIDATE,
             pCompositionProcessorEngine->GetCandidateListIndexRange(),
-            FALSE);
+            Global::hideCandidateWindow);
         if (!_pCandidateListUIPresenter)
         {
             return E_OUTOFMEMORY;
@@ -379,7 +379,7 @@ HRESULT CNoneIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pC
             _pCandidateListUIPresenter = new (std::nothrow) CCandidateListUIPresenter(this, Global::AtomCandidateWindow,
                 CATEGORY_CANDIDATE,
                 pCompositionProcessorEngine->GetCandidateListIndexRange(),
-                FALSE);
+                Global::hideCandidateWindow);
             if (!_pCandidateListUIPresenter)
             {
                 return E_OUTOFMEMORY;
