@@ -703,36 +703,70 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
         StringCchPrintf(pageCountString, ARRAYSIZE(pageCountString), L"%d", (LONG)*_pIndexRange->GetAt(pageCount));
         ExtTextOut(dcHandle, prc->left + margin + PageCountPosition * cxLine, prc->top + margin + pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, pageCountString, lenOfPageCount, NULL);
 
-        rc.left = prc->left + margin + StringPosition * cxLine;
         int vscrollWidth = (_isStoreAppMode && _pVScrollBarWnd) ? GetSystemMetrics(SM_CXVSCROLL) * 2 : 0;
+
+        rc.left = prc->left + margin + StringPosition * cxLine;
         rc.right = prc->right - margin - vscrollWidth;
 
-        // Candidate Font Color And BK
+        pItemList = _candidateList.GetAt(iIndex);
+
+        int textX = prc->left + margin + StringPosition * cxLine;
+        int textY = prc->top + margin + pageCount * cyLine + cyOffset;
+        int lineRight = prc->right - margin - vscrollWidth;
+
+        SIZE itemSize = {0, 0};
+        GetTextExtentPoint32(dcHandle, pItemList->_ItemString.Get(),
+            static_cast<int>(pItemList->_ItemString.GetLength()), &itemSize);
+        int totalWidth = itemSize.cx;
+
+        SIZE separatorSize = {0, 0};
+        SIZE codeSize = {0, 0};
+        if (pItemList->_ShowFindKeyCode && pItemList->_FindKeyCode.GetLength())
+        {
+            SIZE closingBracketSize = {0, 0};
+            GetTextExtentPoint32(dcHandle, L" [", 2, &separatorSize);
+            GetTextExtentPoint32(dcHandle, pItemList->_FindKeyCode.Get(),
+                static_cast<int>(pItemList->_FindKeyCode.GetLength()), &codeSize);
+            GetTextExtentPoint32(dcHandle, L"]", 1, &closingBracketSize);
+            totalWidth += separatorSize.cx + codeSize.cx + closingBracketSize.cx;
+        }
+
         if (_currentSelection != iIndex)
         {
             SetTextColor(dcHandle, _crTextColor);
             SetBkColor(dcHandle, GetSysColor(COLOR_3DHIGHLIGHT));
+
+            RECT rcItem = { rc.left, rc.top, lineRight, rc.bottom };
+            ExtTextOut(dcHandle, textX, textY, ETO_OPAQUE, &rcItem, pItemList->_ItemString.Get(), (DWORD)pItemList->_ItemString.GetLength(), NULL);
         }
         else
         {
             SetTextColor(dcHandle, _crSelectedTextColor);
             SetBkColor(dcHandle, Global::candidateHighlightColor);
+
+            int pad = 2;
+            RECT rcHighlight;
+            rcHighlight.top = rc.top;
+            rcHighlight.bottom = rc.bottom;
+            rcHighlight.left = max(rc.left, textX - pad);
+            rcHighlight.right = min(lineRight, textX + totalWidth + pad);
+
+            if (rcHighlight.left > rc.left)
+            {
+                RECT rcLeftRest = { rc.left, rc.top, rcHighlight.left, rc.bottom };
+                FillRect(dcHandle, &rcLeftRest, (HBRUSH)(COLOR_3DHIGHLIGHT + 1));
+            }
+            if (lineRight > rcHighlight.right)
+            {
+                RECT rcRightRest = { rcHighlight.right, rc.top, lineRight, rc.bottom };
+                FillRect(dcHandle, &rcRightRest, (HBRUSH)(COLOR_3DHIGHLIGHT + 1));
+            }
+
+            ExtTextOut(dcHandle, textX, textY, ETO_OPAQUE, &rcHighlight, pItemList->_ItemString.Get(), (DWORD)pItemList->_ItemString.GetLength(), NULL);
         }
 
-        pItemList = _candidateList.GetAt(iIndex);
-        ExtTextOut(dcHandle, prc->left + margin + StringPosition * cxLine, prc->top + margin + pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, pItemList->_ItemString.Get(), (DWORD)pItemList->_ItemString.GetLength(), NULL);
         if (pItemList->_ShowFindKeyCode && pItemList->_FindKeyCode.GetLength())
         {
-            SIZE itemSize = {0, 0};
-            SIZE separatorSize = {0, 0};
-            SIZE codeSize = {0, 0};
-            int textX = prc->left + margin + StringPosition * cxLine;
-            int textY = prc->top + margin + pageCount * cyLine + cyOffset;
-            GetTextExtentPoint32(dcHandle, pItemList->_ItemString.Get(),
-                static_cast<int>(pItemList->_ItemString.GetLength()), &itemSize);
-            GetTextExtentPoint32(dcHandle, L" [", 2, &separatorSize);
-            GetTextExtentPoint32(dcHandle, pItemList->_FindKeyCode.Get(),
-                static_cast<int>(pItemList->_FindKeyCode.GetLength()), &codeSize);
             TextOut(dcHandle, textX + itemSize.cx, textY, L" [", 2);
             TextOut(dcHandle, textX + itemSize.cx + separatorSize.cx, textY,
                 pItemList->_FindKeyCode.Get(), static_cast<int>(pItemList->_FindKeyCode.GetLength()));
