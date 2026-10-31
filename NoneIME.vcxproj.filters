@@ -33,18 +33,6 @@
     <None Include="image\ImeModeOff.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="image\DoubleSingleByteOn.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="image\DoubleSingleByteOff.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="image\PunctuationOn.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="image\PunctuationOff.ico">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BaseDictionaryEngine.h">
