@@ -134,10 +134,6 @@ extern const GUID NoneIMEGuidDisplayAttributeConverted;
 
 extern const GUID NoneIMEGuidCandUIElement;
 
-extern const WCHAR UnicodeByteOrderMark;
-extern const WCHAR KeywordDelimiter;
-extern const WCHAR StringDelimiter;
-
 extern const WCHAR ImeModeDescription[];
 extern const int ImeModeOnIcoIndex;
 extern const int ImeModeOffIcoIndex;

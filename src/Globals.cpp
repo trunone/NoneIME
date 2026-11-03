@@ -150,17 +150,6 @@ extern const GUID NoneIMEGuidCandUIElement = {
 };
 
 //---------------------------------------------------------------------
-// Unicode byte order mark
-//---------------------------------------------------------------------
-extern const WCHAR UnicodeByteOrderMark = 0xFEFF;
-
-//---------------------------------------------------------------------
-// dictionary table delimiter
-//---------------------------------------------------------------------
-extern const WCHAR KeywordDelimiter = L'=';
-extern const WCHAR StringDelimiter  = L'\"';
-
-//---------------------------------------------------------------------
 // defined item in setting file table [PreservedKey] section
 //---------------------------------------------------------------------
 extern const WCHAR ImeModeDescription[] = L"Chinese/English input (Shift)";
