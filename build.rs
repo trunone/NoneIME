@@ -29,7 +29,7 @@ fn main() {
     let rc_content = fs::read_to_string(&rc_path).unwrap();
     let normalized_rc = rc_content.replace('\\', "/");
     let normalized_rc_path = Path::new(&out_dir).join("NoneIME_normalized.rc");
-    fs::write(&normalized_rc_path, normalized_rc).unwrap();
+    fs::write(&normalized_rc_path, &normalized_rc).unwrap();
 
     let target_env = env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default();
     let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default();
@@ -39,27 +39,30 @@ fn main() {
             "x86" => "i686-w64-mingw32-windres",
             _ => "x86_64-w64-mingw32-windres",
         };
-        let out_obj = Path::new(&out_dir).join("NoneIME_res.o");
-        let status = Command::new(windres_cmd)
-            .current_dir(&manifest_dir)
-            .args([
-                "-i",
-                normalized_rc_path.to_str().unwrap(),
-                "-o",
-                out_obj.to_str().unwrap(),
-                "-I",
-                &manifest_dir,
-            ])
-            .status();
+        // Verify windres tool existence
+        if Command::new(windres_cmd).arg("--version").output().is_ok() {
+            let out_obj = Path::new(&out_dir).join("NoneIME_res.o");
+            let status = Command::new(windres_cmd)
+                .current_dir(&manifest_dir)
+                .args([
+                    "-i",
+                    normalized_rc_path.to_str().unwrap(),
+                    "-o",
+                    out_obj.to_str().unwrap(),
+                    "-I",
+                    &manifest_dir,
+                ])
+                .status();
 
-        if let Ok(st) = status {
-            if st.success() {
-                println!("cargo:rustc-link-arg={}", out_obj.display());
-                return;
+            if let Ok(st) = status {
+                if st.success() {
+                    println!("cargo:rustc-link-arg={}", out_obj.display());
+                    return;
+                }
             }
         }
     }
 
-    // Fall back to embed-resource crate (works out of the box with MSVC rc.exe or local windres)
+    // For MSVC (or when windres is not used), compile using embed-resource
     let _ = embed_resource::compile(&normalized_rc_path, &[&manifest_dir]);
 }

@@ -27,11 +27,13 @@ if (-not $cargoCmd) {
 
 # Determine cargo target triple
 if (-not $Target) {
-    $isGnu = (gcc --version 2>$null) -and -not (Get-Command cl.exe -ErrorAction SilentlyContinue)
-    if ($Platform -eq 'x64') {
-        $Target = if ($isGnu) { 'x86_64-pc-windows-gnu' } else { 'x86_64-pc-windows-msvc' }
+    $defaultTarget = (rustc -vV | Select-String '^host:\s*(.+)$').Matches.Groups[1].Value.Trim()
+    if ($defaultTarget -like '*msvc*') {
+        $Target = if ($Platform -eq 'x64') { 'x86_64-pc-windows-msvc' } else { 'i686-pc-windows-msvc' }
+    } elseif ($defaultTarget -like '*gnu*') {
+        $Target = if ($Platform -eq 'x64') { 'x86_64-pc-windows-gnu' } else { 'i686-pc-windows-gnu' }
     } else {
-        $Target = if ($isGnu) { 'i686-pc-windows-gnu' } else { 'i686-pc-windows-msvc' }
+        $Target = if ($Platform -eq 'x64') { 'x86_64-pc-windows-msvc' } else { 'i686-pc-windows-msvc' }
     }
 }
 
