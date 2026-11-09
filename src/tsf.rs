@@ -5,7 +5,8 @@ mod win32_tsf {
     use std::cell::RefCell;
     use std::rc::Rc;
     use std::sync::atomic::{AtomicI32, Ordering};
-    use windows_core::{implement, Interface, IUnknownImpl, Ref, Result, BOOL, GUID};
+use std::mem::ManuallyDrop;
+use windows_core::{implement, Interface, IUnknownImpl, Ref, Result, BOOL, GUID};
     use windows::Win32::Foundation::*;
     use windows::Win32::System::Com::*;
     use windows::Win32::UI::Input::KeyboardAndMouse::{GetKeyState, VK_CONTROL, VK_MENU, VK_SHIFT};
@@ -19,24 +20,30 @@ mod win32_tsf {
     pub const GUID_PRESERVED_KEY_IME_MODE: GUID = GUID::from_u128(0x4b62b54b_f828_43b5_9095_a96df9cbdf38);
     pub const TF_MOD_ON_KEYUP_SHIFT_ONLY: u32 = 0x00010000 | TF_MOD_ON_KEYUP;
 
+struct ActiveService {
+    client_id: u32,
+    thread_mgr: ITfThreadMgr,
+    engine: Rc<RefCell<CompositionEngine>>,
+    composition: Rc<RefCell<Option<ITfComposition>>>,
+    text_processor: ITfTextInputProcessor,
+}
+
     thread_local! {
-        static ACTIVE_ENGINE: RefCell<Option<Rc<RefCell<CompositionEngine>>>> = RefCell::new(None);
-        static ACTIVE_SERVICE_INFO: RefCell<Option<(u32, Option<ITfThreadMgr>, Option<ITfTextInputProcessor>, Option<ITfComposition>)>> = RefCell::new(None);
+    static ACTIVE_SERVICE: RefCell<Option<ActiveService>> = RefCell::new(None);
     }
 
     pub fn get_active_composition_engine() -> Option<CompositionEngine> {
-        ACTIVE_ENGINE.with(|cell| {
-            cell.borrow().as_ref().map(|rc| rc.borrow().clone())
+    ACTIVE_SERVICE.with(|cell| {
+        cell.borrow().as_ref().map(|s| s.engine.borrow().clone())
         })
     }
 
     pub fn select_active_candidate(idx: usize) {
-        let (engine_rc, service_tuple) = (
-            ACTIVE_ENGINE.with(|c| c.borrow().clone()),
-            ACTIVE_SERVICE_INFO.with(|c| c.borrow().clone()),
-        );
+    let service = ACTIVE_SERVICE.with(|c| c.borrow().as_ref().map(|s| {
+        (s.client_id, s.thread_mgr.clone(), s.engine.clone(), s.composition.clone(), s.text_processor.clone())
+    }));
 
-        if let (Some(engine_rc), Some((tid, Some(tm), Some(processor), comp))) = (engine_rc, service_tuple) {
+    if let Some((tid, tm, engine_rc, comp_rc, processor)) = service {
             let text = {
                 let mut engine = engine_rc.borrow_mut();
                 let actual_idx = engine.current_page * crate::composition::PAGE_SIZE + idx;
@@ -53,12 +60,13 @@ mod win32_tsf {
                 unsafe {
                     if let Ok(doc_mgr) = tm.GetFocus() {
                         if let Ok(context) = doc_mgr.GetTop() {
-                            let session = EditSession::new_commit(text, context.clone(), processor, comp);
+                        let session = EditSession::new_commit(text, context.clone(), processor, comp_rc.clone());
                             let edit_session: ITfEditSession = session.into();
                             let _ = context.RequestEditSession(tid, &edit_session, TF_ES_SYNC | TF_ES_READWRITE);
                         }
                     }
                 }
+            *comp_rc.borrow_mut() = None;
                 CandidateWindow::hide();
             }
         }
@@ -75,7 +83,7 @@ mod win32_tsf {
         client_id: RefCell<u32>,
         thread_mgr: RefCell<Option<ITfThreadMgr>>,
         pub engine: Rc<RefCell<CompositionEngine>>,
-        pub composition: RefCell<Option<ITfComposition>>,
+    pub composition: Rc<RefCell<Option<ITfComposition>>>,
     }
 
     impl NoneIME {
@@ -85,7 +93,7 @@ mod win32_tsf {
                 client_id: RefCell::new(0),
                 thread_mgr: RefCell::new(None),
                 engine: Rc::new(RefCell::new(CompositionEngine::new())),
-                composition: RefCell::new(None),
+                composition: Rc::new(RefCell::new(None)),
             }
         }
     }
@@ -122,10 +130,7 @@ mod win32_tsf {
             *self.client_id.borrow_mut() = 0;
             self.engine.borrow_mut().clear();
 
-            ACTIVE_ENGINE.with(|cell| {
-                *cell.borrow_mut() = None;
-            });
-            ACTIVE_SERVICE_INFO.with(|cell| {
+            ACTIVE_SERVICE.with(|cell| {
                 *cell.borrow_mut() = None;
             });
 
@@ -155,18 +160,15 @@ mod win32_tsf {
                 }
             }
 
-            // Sync shared engine pointer with thread local
-            ACTIVE_ENGINE.with(|cell| {
-                *cell.borrow_mut() = Some(self.engine.clone());
-            });
-
-            ACTIVE_SERVICE_INFO.with(|cell| {
-                *cell.borrow_mut() = Some((
-                    tid,
-                    Some(tm.clone()),
-                    Some(self.to_interface()),
-                    None,
-                ));
+            // Sync shared service pointer with thread local
+            ACTIVE_SERVICE.with(|cell| {
+                *cell.borrow_mut() = Some(ActiveService {
+                    client_id: tid,
+                    thread_mgr: tm.clone(),
+                    engine: self.engine.clone(),
+                    composition: self.composition.clone(),
+                    text_processor: self.to_interface(),
+                });
             });
 
             Ok(())
@@ -263,21 +265,6 @@ mod win32_tsf {
     }
 
     impl NoneIME_Impl {
-        fn get_selection_point(&self, context: &ITfContext) -> (i32, i32) {
-            let mut pt = (100, 100);
-            unsafe {
-                if let Ok(view) = context.GetActiveView() {
-                    let mut rc = RECT::default();
-                    let mut clipped = BOOL(0);
-                    // Use null range to get caret position rectangle
-                    if view.GetTextExt(0, None, &mut rc, &mut clipped).is_ok() {
-                        pt = (rc.left, rc.bottom + 2);
-                    }
-                }
-            }
-            pt
-        }
-
         fn update_composition_ui(&self, context: &ITfContext) -> Result<()> {
             let engine = self.engine.borrow();
             if engine.is_composing() {
@@ -288,15 +275,15 @@ mod win32_tsf {
                     text,
                     context.clone(),
                     self.to_interface(),
-                    self.composition.borrow().clone(),
+                    self.composition.clone(),
                 );
                 let edit_session: ITfEditSession = session.into();
                 unsafe {
                     let _ = context.RequestEditSession(tid, &edit_session, TF_ES_SYNC | TF_ES_READWRITE);
                 }
 
-                let (x, y) = self.get_selection_point(context);
-                CandidateWindow::update_and_show(&engine, x, y);
+                // If candidate window position was updated during edit session, update_and_show will use it
+                CandidateWindow::update_and_show(&engine);
             } else {
                 CandidateWindow::hide();
             }
@@ -309,7 +296,7 @@ mod win32_tsf {
                 text.to_string(),
                 context.clone(),
                 self.to_interface(),
-                self.composition.borrow().clone(),
+                self.composition.clone(),
             );
             let edit_session: ITfEditSession = session.into();
             unsafe {
@@ -327,7 +314,7 @@ mod win32_tsf {
         pub is_commit: bool,
         pub context: ITfContext,
         pub text_service: ITfTextInputProcessor,
-        pub composition: Option<ITfComposition>,
+        pub composition: Rc<RefCell<Option<ITfComposition>>>,
     }
 
     impl EditSession {
@@ -335,7 +322,7 @@ mod win32_tsf {
             text: String,
             context: ITfContext,
             text_service: ITfTextInputProcessor,
-            composition: Option<ITfComposition>,
+            composition: Rc<RefCell<Option<ITfComposition>>>,
         ) -> Self {
             Self {
                 text,
@@ -350,7 +337,7 @@ mod win32_tsf {
             text: String,
             context: ITfContext,
             text_service: ITfTextInputProcessor,
-            composition: Option<ITfComposition>,
+            composition: Rc<RefCell<Option<ITfComposition>>>,
         ) -> Self {
             Self {
                 text,
@@ -366,12 +353,38 @@ mod win32_tsf {
         fn DoEditSession(&self, ec: u32) -> Result<()> {
             let text_wide: Vec<u16> = self.text.encode_utf16().collect();
             unsafe {
-                if let Some(ref comp) = self.composition {
+                let active_comp = self.composition.borrow().clone();
+
+                if let Some(comp) = active_comp {
                     if let Ok(range) = comp.GetRange() {
                         let _ = range.SetText(ec, 0, &text_wide);
-                        if self.is_commit {
+
+                        if !self.is_commit {
+                            // Update selection caret to end of composition range
+                            if let Ok(selection_range) = range.Clone() {
+                                let _ = selection_range.Collapse(ec, TF_ANCHOR_END);
+                                let tf_sel = TF_SELECTION {
+                                    range: ManuallyDrop::new(Some(selection_range.clone())),
+                                    style: TF_SELECTIONSTYLE {
+                                        ase: TF_AE_NONE,
+                                        fInterimChar: BOOL(0),
+                                    },
+                                };
+                                let _ = self.context.SetSelection(ec, &[tf_sel]);
+
+                                // Query caret position for candidate window
+                                if let Ok(view) = self.context.GetActiveView() {
+                                    let mut rc = RECT::default();
+                                    let mut clipped = BOOL(0);
+                                    if view.GetTextExt(ec, &selection_range, &mut rc, &mut clipped).is_ok() {
+                                        CandidateWindow::set_target_position(rc.left, rc.bottom + 2);
+                                    }
+                                }
+                            }
+                        } else {
                             let _ = range.Collapse(ec, TF_ANCHOR_END);
                             let _ = comp.EndComposition(ec);
+                            *self.composition.borrow_mut() = None;
                         }
                     }
                 } else if let Ok(insert) = self.context.cast::<ITfInsertAtSelection>() {
@@ -380,8 +393,28 @@ mod win32_tsf {
                             if let Ok(ctx_comp) = self.context.cast::<ITfContextComposition>() {
                                 if let Ok(sink) = self.text_service.cast::<ITfCompositionSink>() {
                                     if let Ok(new_comp) = ctx_comp.StartComposition(ec, &range, &sink) {
-                                        // Composition successfully started
-                                        let _ = new_comp;
+                                        *self.composition.borrow_mut() = Some(new_comp);
+
+                                        // Set selection and query position
+                                        if let Ok(selection_range) = range.Clone() {
+                                            let _ = selection_range.Collapse(ec, TF_ANCHOR_END);
+                                            let tf_sel = TF_SELECTION {
+                                                range: ManuallyDrop::new(Some(selection_range.clone())),
+                                                style: TF_SELECTIONSTYLE {
+                                                    ase: TF_AE_NONE,
+                                                    fInterimChar: BOOL(0),
+                                                },
+                                            };
+                                            let _ = self.context.SetSelection(ec, &[tf_sel]);
+
+                                            if let Ok(view) = self.context.GetActiveView() {
+                                                let mut rc = RECT::default();
+                                                let mut clipped = BOOL(0);
+                                                if view.GetTextExt(ec, &selection_range, &mut rc, &mut clipped).is_ok() {
+                                                    CandidateWindow::set_target_position(rc.left, rc.bottom + 2);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
