@@ -315,7 +315,6 @@ mod win32_tsf {
             unsafe {
                 let _ = context.RequestEditSession(tid, &edit_session, TF_ES_SYNC | TF_ES_READWRITE);
             }
-            *self.composition.borrow_mut() = None;
             CandidateWindow::hide();
             Ok(())
         }
@@ -372,6 +371,14 @@ mod win32_tsf {
                         let _ = range.SetText(ec, 0, &text_wide);
                         if self.is_commit {
                             let _ = range.Collapse(ec, TF_ANCHOR_END);
+                            let sel = TF_SELECTION {
+                                range: core::mem::ManuallyDrop::new(Some(range.clone())),
+                                style: TF_SELECTIONSTYLE {
+                                    ase: TF_AE_NONE,
+                                    fInterimChar: BOOL(0),
+                                },
+                            };
+                            let _ = self.context.SetSelection(ec, &[sel]);
                             let _ = comp.EndComposition(ec);
                         }
                     }
@@ -387,15 +394,20 @@ mod win32_tsf {
                             }
                         } else {
                             let _ = range.Collapse(ec, TF_ANCHOR_END);
+                            let sel = TF_SELECTION {
+                                range: core::mem::ManuallyDrop::new(Some(range.clone())),
+                                style: TF_SELECTIONSTYLE {
+                                    ase: TF_AE_NONE,
+                                    fInterimChar: BOOL(0),
+                                },
+                            };
+                            let _ = self.context.SetSelection(ec, &[sel]);
                         }
                     }
                 }
 
                 if self.is_commit {
                     *self.composition.borrow_mut() = None;
-                    if let Ok(comp_sink) = self.text_service.cast::<ITfCompositionSink>() {
-                        let _ = comp_sink.OnCompositionTerminated(ec, None);
-                    }
                 }
             }
             Ok(())
