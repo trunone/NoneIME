@@ -382,9 +382,17 @@ struct ActiveService {
                                 }
                             }
                         } else {
-                            let _ = range.Collapse(ec, TF_ANCHOR_END);
                             let _ = comp.EndComposition(ec);
                             *self.composition.borrow_mut() = None;
+                            let _ = range.Collapse(ec, TF_ANCHOR_END);
+                            let tf_sel = TF_SELECTION {
+                                range: ManuallyDrop::new(Some(range)),
+                                style: TF_SELECTIONSTYLE {
+                                    ase: TF_AE_NONE,
+                                    fInterimChar: BOOL(0),
+                                },
+                            };
+                            let _ = self.context.SetSelection(ec, &[tf_sel]);
                         }
                     }
                 } else if let Ok(insert) = self.context.cast::<ITfInsertAtSelection>() {
@@ -420,13 +428,15 @@ struct ActiveService {
                             }
                         } else {
                             let _ = range.Collapse(ec, TF_ANCHOR_END);
+                            let tf_sel = TF_SELECTION {
+                                range: ManuallyDrop::new(Some(range)),
+                                style: TF_SELECTIONSTYLE {
+                                    ase: TF_AE_NONE,
+                                    fInterimChar: BOOL(0),
+                                },
+                            };
+                            let _ = self.context.SetSelection(ec, &[tf_sel]);
                         }
-                    }
-                }
-
-                if self.is_commit {
-                    if let Ok(comp_sink) = self.text_service.cast::<ITfCompositionSink>() {
-                        let _ = comp_sink.OnCompositionTerminated(ec, None);
                     }
                 }
             }
