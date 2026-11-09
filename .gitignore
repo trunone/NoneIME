@@ -9,3 +9,5 @@
 *.suo
 *.VC.db
 *.VC.VC.opendb
+target/
+Cargo.lock
