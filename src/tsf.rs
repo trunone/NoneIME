@@ -7,9 +7,11 @@ mod win32_tsf {
     use std::sync::atomic::{AtomicI32, Ordering};
     use windows_core::{implement, Interface, IUnknownImpl, Ref, Result, BOOL, GUID};
     use windows::Win32::Foundation::*;
+    use windows::Win32::Graphics::Gdi::ClientToScreen;
     use windows::Win32::System::Com::*;
     use windows::Win32::UI::Input::KeyboardAndMouse::{GetKeyState, VK_CONTROL, VK_MENU, VK_SHIFT};
     use windows::Win32::UI::TextServices::*;
+    use windows::Win32::UI::WindowsAndMessaging::{GetCaretPos, GetForegroundWindow};
 
     use crate::candidate_window::CandidateWindow;
     use crate::composition::{CompositionEngine, CompositionResult};
@@ -263,21 +265,6 @@ mod win32_tsf {
     }
 
     impl NoneIME_Impl {
-        fn get_selection_point(&self, context: &ITfContext) -> (i32, i32) {
-            let mut pt = (100, 100);
-            unsafe {
-                if let Ok(view) = context.GetActiveView() {
-                    let mut rc = RECT::default();
-                    let mut clipped = BOOL(0);
-                    // Use null range to get caret position rectangle
-                    if view.GetTextExt(0, None, &mut rc, &mut clipped).is_ok() {
-                        pt = (rc.left, rc.bottom + 2);
-                    }
-                }
-            }
-            pt
-        }
-
         fn update_composition_ui(&self, context: &ITfContext) -> Result<()> {
             let engine = self.engine.borrow();
             if engine.is_composing() {
@@ -295,12 +282,42 @@ mod win32_tsf {
                     let _ = context.RequestEditSession(tid, &edit_session, TF_ES_SYNC | TF_ES_READWRITE);
                 }
 
-                let (x, y) = self.get_selection_point(context);
+                let (x, y) = self.get_caret_screen_point(context);
                 CandidateWindow::update_and_show(&engine, x, y);
             } else {
                 CandidateWindow::hide();
             }
             Ok(())
+        }
+
+        fn get_caret_screen_point(&self, context: &ITfContext) -> (i32, i32) {
+            unsafe {
+                // Method 1: Query ITfContextView window position
+                if let Ok(view) = context.GetActiveView() {
+                    if let Ok(hwnd) = view.GetWnd() {
+                        if !hwnd.0.is_null() {
+                            let mut pt = POINT::default();
+                            if GetCaretPos(&mut pt).is_ok() {
+                                let _ = ClientToScreen(hwnd, &mut pt);
+                                return (pt.x, pt.y + 24);
+                            }
+                        }
+                    }
+                }
+
+                // Method 2: Query foreground window caret
+                let fg_hwnd = GetForegroundWindow();
+                if !fg_hwnd.0.is_null() {
+                    let mut pt = POINT::default();
+                    if GetCaretPos(&mut pt).is_ok() {
+                        let _ = ClientToScreen(fg_hwnd, &mut pt);
+                        if pt.x != 0 || pt.y != 0 {
+                            return (pt.x, pt.y + 24);
+                        }
+                    }
+                }
+            }
+            (100, 100)
         }
 
         pub fn commit_text(&self, context: &ITfContext, text: &str) -> Result<()> {
