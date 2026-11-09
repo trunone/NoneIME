@@ -13,6 +13,7 @@ mod win32 {
 
     const WINDOW_CLASS_NAME: PCWSTR = w!("NoneIMECandidateWindow");
     static CANDIDATE_WINDOW_HWND: AtomicPtr<std::ffi::c_void> = AtomicPtr::new(std::ptr::null_mut());
+    static LAST_TARGET_POS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 
     const CANDWND_ROW_HEIGHT: i32 = 24;
     const CANDWND_BORDER_WIDTH: i32 = 1;
@@ -75,6 +76,21 @@ mod win32 {
             None
         }
 
+        pub fn set_target_position(x: i32, y: i32) {
+            let packed = ((x as u32 as u64) << 32) | (y as u32 as u64);
+            LAST_TARGET_POS.store(packed, Ordering::SeqCst);
+        }
+
+        pub fn get_target_position() -> (i32, i32) {
+            let packed = LAST_TARGET_POS.load(Ordering::SeqCst);
+            if packed == 0 {
+                return (100, 100);
+            }
+            let x = (packed >> 32) as u32 as i32;
+            let y = (packed & 0xFFFFFFFF) as u32 as i32;
+            (x, y)
+        }
+
         pub fn hide() {
             let hwnd_ptr = CANDIDATE_WINDOW_HWND.load(Ordering::SeqCst);
             if !hwnd_ptr.is_null() {
@@ -87,7 +103,7 @@ mod win32 {
             }
         }
 
-        pub fn update_and_show(engine: &CompositionEngine, x: i32, y: i32) {
+        pub fn update_and_show(engine: &CompositionEngine) {
             let cfg = get_config();
             if cfg.hide_candidate_window || !engine.has_candidates() {
                 Self::hide();
@@ -98,6 +114,8 @@ mod win32 {
                 Some(h) => h,
                 None => return,
             };
+
+            let (x, y) = Self::get_target_position();
 
             // Calculate window size based on candidate list
             let candidates = engine.current_page_candidates();
@@ -259,5 +277,6 @@ pub struct CandidateWindow;
 #[cfg(not(windows))]
 impl CandidateWindow {
     pub fn hide() {}
-    pub fn update_and_show(_engine: &crate::composition::CompositionEngine, _x: i32, _y: i32) {}
+    pub fn set_target_position(_x: i32, _y: i32) {}
+    pub fn update_and_show(_engine: &crate::composition::CompositionEngine) {}
 }
