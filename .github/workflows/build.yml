@@ -1,4 +1,4 @@
-name: Build Win64 Debug
+name: Build and Test Multi-Platform
 
 on:
   push:
@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-windows:
+    name: Windows (TSF DLL & Runner)
     runs-on: windows-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,13 +20,73 @@ jobs:
         with:
           targets: x86_64-pc-windows-msvc
 
-      - name: Build Win64 Debug
+      - name: Run Tests
+        run: cargo test
+
+      - name: Build Win64 Debug DLL
         shell: powershell
         run: |
           .\build.ps1 -Configuration Debug -Platform x64
 
-      - name: Upload Build Artifacts
+      - name: Build noneime executable
+        run: cargo build --release --bin noneime --target x86_64-pc-windows-msvc
+
+      - name: Copy executable to bin
+        shell: powershell
+        run: |
+          Copy-Item target\x86_64-pc-windows-msvc\release\noneime.exe bin\x64\Debug\ -Force
+
+      - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: NoneIME-Win64-Debug
+          name: NoneIME-Windows-x64
           path: bin/x64/Debug/
+
+  build-linux:
+    name: Linux (Wayland / X11 Runner)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxkbcommon-dev libxcb1-dev
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Tests
+        run: cargo test
+
+      - name: Build noneime executable
+        run: cargo build --release --bin noneime
+
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: NoneIME-Linux-x64
+          path: target/release/noneime
+
+  build-macos:
+    name: macOS (IMK Runner)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Tests
+        run: cargo test
+
+      - name: Build noneime executable
+        run: cargo build --release --bin noneime
+
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: NoneIME-macOS
+          path: target/release/noneime
