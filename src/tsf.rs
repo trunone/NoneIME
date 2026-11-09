@@ -21,7 +21,7 @@ mod win32_tsf {
 
     thread_local! {
         static ACTIVE_ENGINE: RefCell<Option<Rc<RefCell<CompositionEngine>>>> = RefCell::new(None);
-        static ACTIVE_SERVICE_INFO: RefCell<Option<(u32, Option<ITfThreadMgr>, Option<ITfTextInputProcessor>, Option<ITfComposition>)>> = RefCell::new(None);
+        static ACTIVE_SERVICE_INFO: RefCell<Option<(u32, Option<ITfThreadMgr>, Option<ITfTextInputProcessor>, Rc<RefCell<Option<ITfComposition>>>)>> = RefCell::new(None);
     }
 
     pub fn get_active_composition_engine() -> Option<CompositionEngine> {
@@ -75,7 +75,7 @@ mod win32_tsf {
         client_id: RefCell<u32>,
         thread_mgr: RefCell<Option<ITfThreadMgr>>,
         pub engine: Rc<RefCell<CompositionEngine>>,
-        pub composition: RefCell<Option<ITfComposition>>,
+        pub composition: Rc<RefCell<Option<ITfComposition>>>,
     }
 
     impl NoneIME {
@@ -85,7 +85,7 @@ mod win32_tsf {
                 client_id: RefCell::new(0),
                 thread_mgr: RefCell::new(None),
                 engine: Rc::new(RefCell::new(CompositionEngine::new())),
-                composition: RefCell::new(None),
+                composition: Rc::new(RefCell::new(None)),
             }
         }
     }
@@ -165,7 +165,7 @@ mod win32_tsf {
                     tid,
                     Some(tm.clone()),
                     Some(self.to_interface()),
-                    None,
+                    self.composition.clone(),
                 ));
             });
 
@@ -288,7 +288,7 @@ mod win32_tsf {
                     text,
                     context.clone(),
                     self.to_interface(),
-                    self.composition.borrow().clone(),
+                    self.composition.clone(),
                 );
                 let edit_session: ITfEditSession = session.into();
                 unsafe {
@@ -309,7 +309,7 @@ mod win32_tsf {
                 text.to_string(),
                 context.clone(),
                 self.to_interface(),
-                self.composition.borrow().clone(),
+                self.composition.clone(),
             );
             let edit_session: ITfEditSession = session.into();
             unsafe {
@@ -327,7 +327,7 @@ mod win32_tsf {
         pub is_commit: bool,
         pub context: ITfContext,
         pub text_service: ITfTextInputProcessor,
-        pub composition: Option<ITfComposition>,
+        pub composition: Rc<RefCell<Option<ITfComposition>>>,
     }
 
     impl EditSession {
@@ -335,7 +335,7 @@ mod win32_tsf {
             text: String,
             context: ITfContext,
             text_service: ITfTextInputProcessor,
-            composition: Option<ITfComposition>,
+            composition: Rc<RefCell<Option<ITfComposition>>>,
         ) -> Self {
             Self {
                 text,
@@ -350,7 +350,7 @@ mod win32_tsf {
             text: String,
             context: ITfContext,
             text_service: ITfTextInputProcessor,
-            composition: Option<ITfComposition>,
+            composition: Rc<RefCell<Option<ITfComposition>>>,
         ) -> Self {
             Self {
                 text,
@@ -366,7 +366,8 @@ mod win32_tsf {
         fn DoEditSession(&self, ec: u32) -> Result<()> {
             let text_wide: Vec<u16> = self.text.encode_utf16().collect();
             unsafe {
-                if let Some(ref comp) = self.composition {
+                let comp_opt = self.composition.borrow().clone();
+                if let Some(ref comp) = comp_opt {
                     if let Ok(range) = comp.GetRange() {
                         let _ = range.SetText(ec, 0, &text_wide);
                         if self.is_commit {
@@ -380,8 +381,7 @@ mod win32_tsf {
                             if let Ok(ctx_comp) = self.context.cast::<ITfContextComposition>() {
                                 if let Ok(sink) = self.text_service.cast::<ITfCompositionSink>() {
                                     if let Ok(new_comp) = ctx_comp.StartComposition(ec, &range, &sink) {
-                                        // Composition successfully started
-                                        let _ = new_comp;
+                                        *self.composition.borrow_mut() = Some(new_comp);
                                     }
                                 }
                             }
@@ -392,6 +392,7 @@ mod win32_tsf {
                 }
 
                 if self.is_commit {
+                    *self.composition.borrow_mut() = None;
                     if let Ok(comp_sink) = self.text_service.cast::<ITfCompositionSink>() {
                         let _ = comp_sink.OnCompositionTerminated(ec, None);
                     }
