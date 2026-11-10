@@ -33,7 +33,7 @@ impl ImekitRunner {
     /// Update preedit text in the IME based on the composition engine state
     pub fn update_preedit(&self, serial: u32) -> Result<(), imekit::Error> {
         if self.engine.is_composing() {
-            let mut preedit_display = self.engine.composition_buffer.clone();
+            let mut preedit_display = self.engine.composition_buffer_display();
 
             if self.engine.has_candidates() {
                 preedit_display.push(' ');
