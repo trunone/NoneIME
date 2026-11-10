@@ -48,6 +48,10 @@ impl CompositionEngine {
         !self.composition_buffer.is_empty()
     }
 
+    pub fn composition_buffer_display(&self) -> String {
+        self.composition_buffer.to_ascii_uppercase()
+    }
+
     pub fn has_candidates(&self) -> bool {
         !self.candidates.is_empty()
     }
@@ -173,10 +177,9 @@ impl CompositionEngine {
                     self.clear();
                     CompositionResult::CommitText(commit_val)
                 } else if !self.composition_buffer.is_empty() {
-                    // No candidate found: commit raw buffer
-                    let commit_val = self.composition_buffer.clone();
+                    // Invalid/unknown root composition: do not commit text, clear buffer
                     self.clear();
-                    CompositionResult::CommitText(commit_val)
+                    CompositionResult::UpdateUI
                 } else {
                     CompositionResult::DoNothing
                 }
@@ -221,6 +224,32 @@ impl CompositionEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_composition_display_uppercase() {
+        let mut engine = CompositionEngine::new();
+        engine.on_key_down(0x41, 'a', false, false);
+        engine.on_key_down(0x42, 'b', false, false);
+        assert_eq!(engine.composition_buffer, "ab");
+        assert_eq!(engine.composition_buffer_display(), "AB");
+    }
+
+    #[test]
+    fn test_invalid_composition_does_not_commit() {
+        let mut engine = CompositionEngine::new();
+        // Type invalid root combo "zzzzz"
+        for _ in 0..5 {
+            engine.on_key_down(0x5A, 'z', false, false);
+        }
+        assert!(!engine.has_candidates());
+        assert!(engine.is_composing());
+
+        // Press Space on invalid composition: should clear and NOT commit text
+        let res = engine.on_key_down(0x20, ' ', false, false);
+        assert_eq!(res, CompositionResult::UpdateUI);
+        assert!(!engine.is_composing());
+        assert!(engine.composition_buffer.is_empty());
+    }
 
     #[test]
     fn test_composition_workflow() {

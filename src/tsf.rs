@@ -268,7 +268,7 @@ struct ActiveService {
         fn update_composition_ui(&self, context: &ITfContext) -> Result<()> {
             let engine = self.engine.borrow();
             if engine.is_composing() {
-                let text = engine.composition_buffer.clone();
+                let text = engine.composition_buffer_display();
                 let tid = *self.client_id.borrow();
 
                 let session = EditSession::new_composition(
@@ -285,6 +285,20 @@ struct ActiveService {
                 // If candidate window position was updated during edit session, update_and_show will use it
                 CandidateWindow::update_and_show(&engine);
             } else {
+                // Not composing: terminate/clear any active TSF composition
+                if self.composition.borrow().is_some() {
+                    let tid = *self.client_id.borrow();
+                    let session = EditSession::new_commit(
+                        String::new(),
+                        context.clone(),
+                        self.to_interface(),
+                        self.composition.clone(),
+                    );
+                    let edit_session: ITfEditSession = session.into();
+                    unsafe {
+                        let _ = context.RequestEditSession(tid, &edit_session, TF_ES_SYNC | TF_ES_READWRITE);
+                    }
+                }
                 CandidateWindow::hide();
             }
             Ok(())
